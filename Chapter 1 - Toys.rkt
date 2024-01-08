@@ -51,4 +51,28 @@
 ; cdr l (where l is ()) => Error                 ; You cannot ask for the cdr of the null list
 
 
-; RETURN TO PAGE 7 @SELF
+; Law of Cons: The primitive cons takes two arguments. First argument is any S-expression, second must be a list, resulting in a list.
+; cons of the atom a and the list l (where a is peanut and l is (butter and jelly)) => (peanut butter and jelly)
+(cons 'peanut '(butter and jelly))    ; cons adds an atom or S-expression to the front of the list given
+(cons '(banana and) '(peanut butter and jelly))  ; Yields ((banana and) peanut butter and jelly)
+
+
+; Law of Null?: The primitive null? is defined only for lists
+(null? '())    ; () is an empty list which is also the null list. True #t
+(null? (quote ()))     ; This is simply the same as line 61. True #t
+(null? '(a b c))     ; This is false since (a b c) is not the null list. False #f
+(null? 'spaghetti)   ; You cannot ask null? of an atom. False #f
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Defining atom? for Scheme because it is not a primitive like car, cdr and null?:
+(define (atom? x)
+  (and (not (pair? x)) (not (null? x))))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(atom? 'Harry)   ; Yields true, Harry is a string of characters, hence an atom
+
+
+; Law of Eq?: The primitive eq? takes two arguments. Each must be a non-numeric atom.
+(eq? (car '(beans beans we need jelly beans)) (car (cdr '(beans beans we need jelly beans))))
+; Above yields true. Compares beans to beans, which are both the same atom from the list.
