@@ -41,13 +41,18 @@
 (define (member? x lat)
   (cond
     ((null? lat) #f)
-    (else (or (eq? (car lat) a)
-              (member? a (cdr lat))))))
+    (else (or (eq? (car lat) x)
+              (member? x (cdr lat))))))
 
 
+; Notes of member? function structure:
+; - Similar to lat?'s structure, member? calls itself again at the last condition of checking if a is a member of cdr lat.
+; - The function first checks if lat is the null list. If so, it is automatically #f because an atom can't be a member of a null list
+; - At the else statement, the function constantly checks if the car lat is equal to the atom x.
+; - The last line: (member? x (cdr lat)) just creates a new argument which is cdr lat and checks if the first of that list is an atom
+; - The function does this over and over again, until we either 1. find that x is equal to car lat or 2. null? lat is #t; therefore, we return #f.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; The First Commandment:
 ; Always ask null? as the first question in expressing any function.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-; REFER BACK TO P23 @SELF
