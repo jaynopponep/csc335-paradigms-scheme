@@ -1,7 +1,7 @@
 #lang racket
 ;
 ; Chapter 2 - Do It Again
-; Contents: lats, 
+; Contents: lats, or, member?, the first commandment
 ;
 
 ; Redefine atom? function:
@@ -10,7 +10,7 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; lat?: "list of atoms", finds if all S-expressions given in a list are atoms.
+; lat?: aka "list of atoms", finds if all S-expressions given in a list are atoms.
 ; First, we must define lat? because it is not a primitive.
 (define (lat? x)
   (cond
@@ -35,4 +35,19 @@
 (or (null? '(a b c)) (null? '()))    ; True because the second question answers true, since () is the null list
 
 
+; member? x lat: essentially asks if a certain atom exists within a list of atoms.
+; x, in context, is an atom; lat, is a list of atoms. Specifically, member? checks if x exists in lat
+; Let's define member? because it is not a primitive:
+(define (member? x lat)
+  (cond
+    ((null? lat) #f)
+    (else (or (eq? (car lat) a)
+              (member? a (cdr lat))))))
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; The First Commandment:
+; Always ask null? as the first question in expressing any function.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+; REFER BACK TO P23 @SELF
