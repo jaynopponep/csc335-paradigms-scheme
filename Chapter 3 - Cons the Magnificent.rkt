@@ -1,8 +1,8 @@
 #lang racket
 ;
 ; Chapter 3 - Cons the Magnificent
-; Contents: rember, firsts, insertR, the second & third commandment
-;
+; Contents: rember, firsts, insertR/L, subst & subst2, multirember, multiinsertL/R, 
+; multisubst, the second, third, and fourth commandment
 
 ; rember a lat: "rember" stands for remove a member, removes the first occurrence of member 'a' from a lat.
 ; We must define rember because it is not primitive:
@@ -84,7 +84,7 @@
 (subst 'topping 'fudge '(ice cream with fudge for dessert))
 
 
-; subst2 new o1 o2 lat:
+; subst2 new o1 o2 lat: substitutes the value new into either o1 or o2, whichever appears first. 
 (define (subst2 new o1 o2 lat)
   (cond
     ((null? lat) '())
@@ -98,4 +98,58 @@
 (subst2 'vanilla 'chocolate 'banana '(banana ice cream with chocolate topping))
 
 
-; RETURN TO PG52 @SELF
+; multirember a lat: removes all occurences of the member a found in lat
+(define (multirember a lat)
+  (cond
+    ((null? lat) '())
+    (else
+     (cond
+       ((eq? (car lat) a) (multirember a (cdr lat)))
+       (else (cons (car lat)
+                   (multirember a (cdr lat))))))))
+; example:
+(multirember 'cup '(coffee cup tea cup and hick cup))
+; breakdown of function:
+; multirember a lat is very similar to the other functions; however, after checking if the first value is the same as the member we
+; are finding, we recursively call the function again with a (cdr lat) as the argument, basically ignoring the member and calling the rest of
+; the function and never adding the atom to the list we are constructing with cons.
+
+
+(define (multiinsertR new old lat)
+  (cond
+    ((null? lat) '())
+    (else
+     (cond
+       ((eq? old (car lat)) (cons old (cons new (multiinsertR new old (cdr lat)))))
+       (else (cons (car lat) (multiinsertR new old (cdr lat))))))))
+; example:
+(multiinsertR 'topping 'with '(ice with cream with fudge with for dessert))
+
+
+(define (multiinsertL new old lat)
+  (cond
+    ((null? lat) '())
+    (else
+     (cond
+       ((eq? old (car lat)) (cons new (cons old (multiinsertL new old (cdr lat)))))
+       (else (cons (car lat) (multiinsertL new old (cdr lat))))))))
+; example:
+(multiinsertL 'topping 'with '(ice with cream with fudge with for dessert))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; The Fourth Commandment: Always change at least one argument while recurring.
+; It must be changed to be closer to termination.
+; The changing argument must be tested in the termination condition: when using cdr, test termination with null?.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+(define (multisubst new old lat)
+  (cond
+    ((null? lat) '())
+    (else
+     (cond
+       ((eq? old (car lat)) (cons new (multisubst new old (cdr lat))))
+       (else (cons (car lat) (multisubst new old (cdr lat))))))))
+; example:
+(multisubst 'topping 'with '(ice with cream with fudge with for dessert))
+
+
