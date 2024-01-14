@@ -1,7 +1,7 @@
 #lang racket
 ;
 ; Chapter 4 - Numbers Games
-; Contents:
+; Contents: o+, o-, o*, o-, tup, the Fifth Commandment, 
 ;
 
 ; add1 n: add 1 to n
@@ -95,7 +95,42 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
+; tup+: adds the first of tup1 to the first of tup2 to a new tup, then the second of tup1 to the second of tup2, then so forth.
+(define (tup+ tup1 tup2)
+  (cond
+    ((null? tup1) tup2)
+    ((null? tup2) tup1)
+    ((and (null? tup1) (null? tup2))
+     '())
+    (else
+     (cons (o+ (car tup1) (car tup2))
+           (tup+
+            (cdr tup1) (cdr tup2))))))
+; example:
+(tup+ '(2 3) '(4 6))
 
-; RETURN TO PAGE 68 @SELF
+
+; > comparator
+(define (> n m)
+  (cond
+    ((zero? n) #f)
+    ((zero? m) #t)
+    (else (> (sub1 n) (sub1 m)))))
+; < comparator
+(define (< n m)
+  (cond
+    ((zero? m) #f)
+    ((zero? n) #t)
+    (else (< (sub1 n) (sub1 m)))))
+; = comparator
+(define (= n m)
+  (cond
+    ((> n m) #f)
+    ((< n m) #f)
+    (else #t)))
+; RETURN TO PG 74 @SELF
+
+
+
 
 
