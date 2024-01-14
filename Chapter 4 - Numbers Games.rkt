@@ -1,7 +1,7 @@
 #lang racket
 ;
 ; Chapter 4 - Numbers Games
-; Contents: o+, o-, o*, o-, tup, the Fifth Commandment, 
+; Contents: operations, comparators, basic functions, revision, the fifth commandment.
 ;
 
 ; add1 n: add 1 to n
@@ -128,9 +128,104 @@
     ((> n m) #f)
     ((< n m) #f)
     (else #t)))
-; RETURN TO PG 74 @SELF
+;example:
+(= 1 1)
+; ^ factorial operator
+(define (^ n m)
+  (cond
+    ((zero? m) 1)
+    (else (o* n (^ n (sub1 m))))))
+;example:
+(^ 2 10)
+; / division operator
+(define (/ n m)
+  (cond
+    ((< n m) 0)
+    (else (add1 (/ (- n m) m)))))
+;example:
+(/ 90 2)
 
 
+; length (of a lat)
+(define (length lat)
+  (cond
+    ((null? lat) 0)
+    (else (add1 (length (cdr lat))))))
+;example:
+(length '(a b c d e f))
+; pick n lat: choose the nth item from lat. Note that lat's start with 1, not 0 like typical arrays
+(define (pick n lat)
+  (cond
+    ((zero? (sub1 n)) (car lat))
+    (else (pick (sub1 n) (cdr lat)))))
+;example:
+(pick 2 '(a b c d e f g))
+; rempick n lat: pick and remove the nth item from lat.
+(define (rempick n lat)
+  (cond
+    ((zero? (sub1 n)) (cdr lat))
+    (else
+     (cons (car lat) (rempick (sub1 n) (cdr lat))))))
+;example:
+(rempick 3 '(hotdogs with hot mustard))
+; no-nums: in a lat, give only the non-number values built into a new lat
+(define (no-nums lat)
+  (cond
+    ((null? lat) '())
+    (else (cond
+            ((number? (car lat))
+             (no-nums (cdr lat)))
+          (else (cons (car lat)
+                      (no-nums (cdr lat))))))))
+;example:
+(no-nums '(5 pears 6 prunes 9 dates))
+; all-nums: extracts a tup from a lat using all numbers in the lat.
+(define (all-nums lat)
+  (cond
+    ((null? lat) '())
+    (else
+     (cond
+       ((number? (car lat))
+        (cons (car lat)
+              (all-nums (cdr lat))))
+       (else (all-nums (cdr lat)))))))
+;example:
+(all-nums '(5 pears 6 prunes 9 dates))
+; eqan?:
+(define (eqan? a1 a2)
+  (cond
+    ((and (number? a1) (number? a2))
+     (= a1 a2))
+    ((or (number? a1) (number? a2))
+     #f)
+    (else (eq? a1 a2))))
+;example:
+(eqan? '99 '99)
+; occur a lat: checks how many times the atom a occurs in lat
+(define (occur a lat)
+  (cond
+    ((null? lat) 0)
+    (else
+     (cond
+       ((eq? (car lat) a)
+        (add1 (occur a (cdr lat))))
+       (else (occur a (cdr lat)))))))
+(occur 'and '(apples and oranges and grapes))
+; one?: returns #t if n is 1, #f otherwise
+;(define (one? n)
+;  (cond
+;    ((zero? n) #f)
+;    (else (zero? (sub1 n)))))
+; we could also make it simpler than this:
+(define (one? n)
+    (= n 1))
+(one? 1)
+(one? 2)
 
-
-
+; rempick REWRITE that uses one?:
+(define (rempick-2 n lat)
+  (cond
+    ((one? n) (cdr lat))
+    (else
+     (cons (car lat) (rempick-2 (sub1 n) (cdr lat))))))
+(rempick-2 2 '(hotdogs with hot mustard))
