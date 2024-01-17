@@ -1,7 +1,7 @@
 #lang racket
 ;
 ; Chapter 6 - Shadows
-; Contents: The Seventh Commandment
+; Contents: The Seventh & Eighth Commandment, numbered?, prefix value, value, etc.
 ;
 ; REDEFINING:
 ; atom?
