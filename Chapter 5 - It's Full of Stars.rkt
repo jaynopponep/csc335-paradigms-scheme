@@ -1,7 +1,7 @@
 #lang racket
 ;
 ; Chapter 5 - It's Full of Stars
-; Contents:
+; Contents: * functions, eqlist?, equal?, the sixth commandment
 ;
 ; REDEFINING:
 ; atom?
@@ -12,6 +12,14 @@
   (cond
     ((zero? m) n)
     (else (add1 (o+ n (sub1 m))))))
+; eqan?
+(define (eqan? a1 a2)
+  (cond
+    ((and (number? a1) (number? a2))
+     (= a1 a2))
+    ((or (number? a1) (number? a2))
+     #f)
+    (else (eq? a1 a2))))
 
 
 ; rember* a l: remove all atoms of "a" from the list of possible lists and atoms "l"
@@ -142,11 +150,23 @@
   (lambda (l1 l2)
     (cond
       ((and (null? l1) (null? l2)) #t)
-      ((and (null? l1) (atom? (car l2))) #f)
-      ((null? l1) #f)
-      ((and (null? l2) (atom? (car l1))) #f)
-      ((and (atom? (car l1))
-            (atom? (car l2)))
-       (and (eqan? (car l1) (car l2))
-            (eqlist? (cdr l1) (cdr l2))))
-      
+      ((or (null? l1) (null? l2)) #f)
+      (else
+       (and (equal? (car l1) (car l2))
+            (eqlist? (cdr l1) (cdr l2)))))))
+; equal? s1 s2: checks if two s-expressions are the same.
+(define equal?
+  (lambda (s1 s2)
+    (cond
+      ((and (atom? s1) (atom? s2))
+       (eqan? s1 s2))
+      ((or (atom? s1) (atom? s2)) #f)
+      (else (eqlist? s1 s2)))))
+;example:
+(eqlist? '(banana (split)) '(banana (split)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; The Sixth Commandment:
+; Simplify only after the function is correct.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;RETURN TO PG94
