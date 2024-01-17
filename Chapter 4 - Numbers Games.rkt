@@ -130,7 +130,7 @@
     (else #t)))
 ;example:
 (= 1 1)
-; ^ factorial operator
+; ^ exponent operator
 (define (^ n m)
   (cond
     ((zero? m) 1)
