@@ -22,20 +22,6 @@
        ((eq? (car lat) a) (multirember a (cdr lat)))
        (else (cons (car lat)
                    (multirember a (cdr lat))))))))
-; firsts
-(define firsts
-  (lambda (l)
-    (cond
-      ((null? l) '())
-      (else (cons (car (car l))
-                  (firsts (cdr l)))))))
-; seconds
-(define seconds
-  (lambda (l)
-    (cond
-      ((null? l) '())
-      (else
-        (cons (second (car l)) (seconds (cdr l)))))))
 
 ; set?: a list of atoms where no atom appears more than once.
 ; if an atom appears more than once, #f is returned
@@ -126,79 +112,3 @@
                   (union (cdr set1) set2))))))
 ;example:
 (union '(stewed tomatoes and macaroni casserole) '(macaroni and cheese))
-
-
-; xxx: returns all atoms in set1 that aren't in set2
-(define xxx
-  (lambda (set1 set2)
-    (cond
-      ((null? set1) '())
-      ((member? (car set1) set2)
-       (xxx (cdr set1) set2))
-      (else (cons (car set1)
-                  (xxx (cdr set1) set2))))))
-; intersectall l-set: checks the atom that intersects all of the sets or all sets have in common
-(define intersectall
-  (lambda (l-set)
-    (cond
-      ((null? (cdr l-set)) (car l-set))
-      (else (intersect (car l-set)
-                       (intersectall (cdr l-set)))))))
-;example:
-(intersectall '((6 pears and) (3 peaches and 6 peppers) (8 pears and 6 plums) (and 6 prunes with some apples)))
-
-
-;a pair?: checks if a list has specifically two S-expressions strictly. Example: 2 atoms, or an atom and a list
-(define a-pair?
-  (lambda (x)
-    (cond
-      ((atom? x) #f)
-      ((null? x) #f)
-      ((null? (cdr x)) #f)
-      ((null? (cdr (cdr x))) #t)
-      (else #f))))
-; helper functions:
-(define first
-  (lambda (p)
-    (cond
-      (else (car p)))))
-(define second
-  (lambda (p)
-    (cond
-      (else (car (cdr p))))))
-(define build
-  (lambda (s1 s2)
-    (cond
-      (else (cons s1
-                  (cons s2 (quote ())))))))
-(define third
-  (lambda (l)
-    (car (cdr (cdr l)))))
-; rel: a set of pairs
-; fun?: a finite function, a list of pairs in which no first element of any pair is duplicated
-(define fun?
-  (lambda (rel)
-    (set? (firsts rel))))
-; revrel: reversing rel's
-(define revrel
-  (lambda (rel)
-    (cond
-      ((null? rel) '())
-      (else (cons (build
-                   (second (car rel))
-                   (first (car rel)))
-                  (revrel (cdr rel)))))))
-; fullfun? fun: returns whether the second element of each pair forms a set. this means no duplicates or else, #f.
-(define fullfun?
-  (lambda (fun)
-    (set? (seconds fun))))
-; one-to-one is just another way to write fullfun?. Lets rewrite it:
-(define one-to-one?
-  (lambda (fun)
-    (fun? (revrel fun))))
-(one-to-one? '((chocolate chip) (doughy cookie)))
-(one-to-one? '((chocolate chip) (chocolate cookie)))
-(one-to-one? '((chocolate chip) (cookie chip)))
-
-
-
