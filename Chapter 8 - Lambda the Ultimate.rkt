@@ -1,8 +1,24 @@
 #lang racket
 ;
 ; Chapter 8 - Lambda the Ultimate
-; Contents:
+; Contents: transforming functions, atom-to-function, the Ninth & Tenth Commandment
 ;
+; REDEFINING:
+(define 1st-sub-exp
+  (lambda (aexp)
+    (car (cdr aexp))))
+(define 2nd-sub-exp
+  (lambda (aexp)
+    (car (cdr (cdr aexp)))))
+(define (^ n m)
+  (cond
+    ((zero? m) 1)
+    (else (* n (^ n (sub1 m))))))
+(define (atom? x)
+    (and (not (pair? x)) (not (null? x))))
+(define operator
+  (lambda (aexp)
+    (car aexp)))
 
 ; rember-f test? a l: removes a from l, utilizing test? function of choice
 (define rember-f
@@ -79,10 +95,16 @@
       ((eq? x (quote +)) +)
       ((eq? x (quote *)) *)
       (else ^))))
-
-
-
-
+; above function used to identify the function as an atom and then actually utilize it as an operator like below:
+(define value
+  (lambda (nexp)
+    (cond
+      ((atom? nexp) nexp)
+      (else
+       ((atom-to-function (operator nexp))
+        (value (1st-sub-exp nexp))
+        (value (2nd-sub-exp nexp)))))))
+; RETURN TO 134
 
 
 
