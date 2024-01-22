@@ -16,9 +16,6 @@
     (else (* n (^ n (sub1 m))))))
 (define (atom? x)
     (and (not (pair? x)) (not (null? x))))
-(define operator
-  (lambda (aexp)
-    (car aexp)))
 
 ; rember-f test? a l: removes a from l, utilizing test? function of choice
 (define rember-f
@@ -33,6 +30,10 @@
 ;example
 ((rember-f eq?) 2 '(1 2 3 4 5))
 
+(define eq?-c
+  (lambda (a)
+    (lambda (x)
+      (eq? a x))))
 
 ; insertL-f: transformation of insertL into insertL-f test?
 (define insertL-f
@@ -95,7 +96,10 @@
       ((eq? x (quote +)) +)
       ((eq? x (quote *)) *)
       (else ^))))
-; above function used to identify the function as an atom and then actually utilize it as an operator like below:
+(define operator
+  (lambda (aexp)
+    (car aexp)))
+; above functions used to identify the function as an atom and then actually utilize it as an operator like below:
 (define value
   (lambda (nexp)
     (cond
@@ -104,9 +108,39 @@
        ((atom-to-function (operator nexp))
         (value (1st-sub-exp nexp))
         (value (2nd-sub-exp nexp)))))))
-; RETURN TO 134
+; multirember-f
+(define multirember-f
+  (lambda (test?)
+    (lambda (a lat)
+      (cond
+        ((null? lat) '())
+        ((test? (car lat) a)
+         ((multirember-f test?) a (cdr lat)))
+        (else (cons (car lat) ((multirember-f test?) a (cdr lat))))))))
+((multirember-f eq?) 'tuna '(shrimp salad tuna salad and tuna))
+; multiremberT: takes a function like eq?-tuna for test? which already has the "a" parameter, and lat as the second parameter
+(define multiremberT
+  (lambda (test? lat)
+    (cond
+      ((null? lat) '())
+      ((test? (car lat))
+       (multiremberT test? (cdr lat)))
+      (else (cons (car lat)
+                  (multiremberT test? (cdr lat)))))))
+(define eq?-tuna
+  (eq?-c (quote tuna)))
+
+(multiremberT eq?-tuna '(shrimp salad tuna salad and tuna))
 
 
+; collector functions we may utilize:
+(define a-friend
+  (lambda (x y)
+    (null? y))) ; returns whether second argument is the empty list
+(define new-friend
+  (lambda (newlat seen)
+    (a-friend newlat
+         (cons (quote tuna) seen ))))
 
 
 
