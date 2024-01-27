@@ -84,9 +84,8 @@
 (define (a-plus-abs-b a b)
   ((if (> b 0) + -) a b))
 (a-plus-abs-b -1 2)
-; the procedure above makes sure to add the absolute values of both a and b. If b happens to be a negative, the procedure will use -, which means this will be - a b.
+; the procedure above makes sure to add a to the absolute value of b. If b happens to be a negative, the procedure will use -, which means this will be - a b.
 ; Since the negatives will cancel out and just add a + b (as a positive number), a is added to the absolute value of b.
-; In the case that a is a negative number, it will still use the addition operator, but this means just subtracting.
 
 
 ; Exercise 1.5
