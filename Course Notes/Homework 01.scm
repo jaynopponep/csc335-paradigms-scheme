@@ -92,6 +92,6 @@
 ; APPLICATIVE-ORDER EVALUATION: The interpreter will evaluate the parameter 0, which is just a 0, then evaluate the (p), which then moves to evaluate the value in (define (p) (p)).
 ; Once this is done, it will finally start interpreting the define (test x y) function.
 ; NORMAL-ORDER EVALUATION: The interpreter would immediately proceed to interpreting the (define (test x y) function, and then check if x is = 0, then it returns 0. If it is not, it will then check the parameter y,
-; then it will see that the parameter passed for y is (p), and then evaluate the value in (define (p) (p)), and then finally return (p) since x is not equal to 0.
-
+; then it will see that the parameter passed for y is (p), and then evaluate the value in (define (p) (p)). However, it seems that the function (define (p) (p)) would just infinitely recursively call itself since there
+; is no terminating condition within this function
 
