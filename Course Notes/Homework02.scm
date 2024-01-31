@@ -1,0 +1,90 @@
+#lang racket
+; Homework 2
+; Spring 2024
+
+
+;; 1. Show how (logical) OR can be implemented using COND
+(define or*
+  (lambda (x y)
+    (cond
+      ((equal? x #t) #t)
+      ((equal? y #t) #t)
+      (else #f))))
+(or* (= 2 1) (> 1 2))
+(or* (= 2 1) (< 1 2))
+
+
+;; 2. Can you implement logical NOT using COND?
+(define not*
+  (lambda (x)
+    (cond
+      ((equal? x #t) #f)
+      (else #t))))
+(not* #t)
+
+
+;; 3. Exercises 1.7 and 1.8 in Abelson and Sussman
+;; 1.7
+(define (square x)
+  (* x x))
+(define (average x y)
+  (/ (+ x y) 2))
+(define (improve guess x)
+  (average guess (/ x guess)))
+;(define (good-enough? guess x)
+;  (< (abs (- (square guess) x)) 0.001))
+(define (good-enough? guess x)
+  (< (abs (- (square guess) x)) 0.000001))
+(define (sqrt-iter guess x)
+  (if (good-enough? guess x)
+      guess
+      (sqrt-iter (improve guess x)
+                 x)))
+
+(define (sqrt x)
+  (sqrt-iter 1.0 x))
+
+(sqrt 0.000108)
+(sqrt 9999999999999999)
+;; I'll come back to this, but all I did was adjust the good-enough? check to compare to a much smaller number than 0.001 (0.000001) to get a more accurate guess for extremely small numbers
+
+
+;; 1.8
+(define (cube x)
+  (* x x x))
+(define (improve-cube guess x)
+  (/ (+ (/ x (* guess guess)) (* 2 guess)) 3))
+(define (cube-root-iter guess x)
+  (if (good-enough? (improve-cube guess x) guess)
+      guess
+      (cube-root-iter (improve-cube guess x) x)))
+
+;; 4. Draw the environment diagram for (f add1 3) given
+
+;;     (define (f x y)
+;;       (+ (x y) (x (x y))))
+;;
+;;     (define (add1 x)
+;;       (+ x 1))
+
+
+;; 5. The primitive function list takes a finite number of numbers (say x1, x2, ..., xk) and returns the list
+;;    (x1 x2 ... xk) of these numbers in the same order.  Thus if x1 = 10, x2 = 3, x3 = 6, and x4 = 20, the call
+;;           (list x1 x2 x3 x4)
+;;    returns
+;;           (10 3 6 20)
+
+;;    In addition, the primitive function cons takes two arguments -- a number new, and a list lst, and
+;;    returns the list formed by inserting new at the front of lst.  Thus (cons 10 (list 3 6 20)) returns
+;;    (10 3 6 20).  
+
+
+;;    Write a function sortFive to input 5 distinct integers and return the list of the input values, sorted
+;;    from smallest to largest.  Thus (sortFive 10 5 20 0 6) returns (0 5 6 10 20).
+
+;;    You may NOT use the primitives min or max, or any kind of recursion or iteration, either in sortFive itself
+;;    or in any helper functions you define.  
+
+;;    You MUST use cond, let, cons and list.
+
+;; (  HINT: you DO want to define helper functions.)
