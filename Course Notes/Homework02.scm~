@@ -54,14 +54,11 @@
   (* x x x))
 (define (improve-cube guess x)
   (/ (+ (/ x (* guess guess)) (* 2 guess)) 3))
-(define (good-enough-cb? guess x)
-  (< (abs (- (cube guess) x)) 0.000001))
 (define (cube-root-iter guess x)
-  (if (good-enough-cb? (improve-cube guess x) guess)
+  (if (good-enough? (improve-cube guess x) guess)
       guess
       (cube-root-iter (improve-cube guess x) x)))
-(define (cube-root x)
-  (cube-root-iter 1.0 x))
+
 ;; 4. Draw the environment diagram for (f add1 3) given
 
 ;;     (define (f x y)
@@ -76,73 +73,18 @@
 ;;           (list x1 x2 x3 x4)
 ;;    returns
 ;;           (10 3 6 20)
-(list '(10 3 6 20))
+
 ;;    In addition, the primitive function cons takes two arguments -- a number new, and a list lst, and
 ;;    returns the list formed by inserting new at the front of lst.  Thus (cons 10 (list 3 6 20)) returns
 ;;    (10 3 6 20).  
 
+
 ;;    Write a function sortFive to input 5 distinct integers and return the list of the input values, sorted
 ;;    from smallest to largest.  Thus (sortFive 10 5 20 0 6) returns (0 5 6 10 20).
+
 ;;    You may NOT use the primitives min or max, or any kind of recursion or iteration, either in sortFive itself
 ;;    or in any helper functions you define.  
+
 ;;    You MUST use cond, let, cons and list.
+
 ;; (  HINT: you DO want to define helper functions.)
-
-(define min-2
-  (lambda (a b)
-      (if (< a b) a b)))
-(define min-3
-  (lambda (a b c)
-      (min-2 a (min-2 b c))))
-(define min-4
-  (lambda (a b c d)
-      (min-2 a (min-3 b c d))))
-(define min-5
-  (lambda (a b c d e)
-      (min-2 a (min-4 b c d e))))
-
-(define sortFive
-  (lambda (a b c d e)
-    (let ((m1 (min-5 a b c d e)))
-      (cond
-        ((= m1 a) (cons a (sortFour b c d e)))
-        ((= m1 b) (cons b (sortFour a c d e)))
-        ((= m1 c) (cons c (sortFour a b d e)))
-        ((= m1 d) (cons d (sortFour a b c e)))
-        ((= m1 e) (cons e (sortFour a b c d)))))))
-(define sortFour
-  (lambda (a b c d)
-    (let ((m1 (min-4 a b c d)))
-      (cond
-        ((= m1 a) (cons a (sortThree b c d)))
-        ((= m1 b) (cons b (sortThree a c d)))
-        ((= m1 c) (cons c (sortThree a b d)))
-        ((= m1 d) (cons d (sortThree a b c)))))))
-(define sortThree
-  (lambda (a b c)
-      (let ((m1 (min-3 a b c)))
-      (cond
-        ((= m1 a) (cons a (sortTwo b c)))
-        ((= m1 b) (cons b (sortTwo a c)))
-        ((= m1 c) (cons c (sortTwo a b)))))))
-(define sortTwo
-  (lambda (a b)
-      (let ((m1 (min-2 a b)))
-      (cond
-        ((= m1 a) (cons a b))
-        ((= m1 b) (cons b a))))))
-
-(sortTwo 1 2)
-
-    
-
-
-
-      
-      
-      
-
-
-
-
-
