@@ -44,24 +44,29 @@
 (define (sqrt x)
   (sqrt-iter 1.0 x))
 
-(sqrt 0.000108)
-(sqrt 9999999999999999)
-;; I'll come back to this, but all I did was adjust the good-enough? check to compare to a much smaller number than 0.001 (0.000001) to get a more accurate guess for extremely small numbers
+;(sqrt 0.000108)
+;(sqrt 9999999999999999)
 
 
 ;; 1.8
 (define (cube x)
   (* x x x))
+
 (define (improve-cube guess x)
   (/ (+ (/ x (* guess guess)) (* 2 guess)) 3))
+
 (define (good-enough-cb? guess x)
   (< (abs (- (cube guess) x)) 0.000001))
+
 (define (cube-root-iter guess x)
   (if (good-enough-cb? (improve-cube guess x) guess)
       guess
       (cube-root-iter (improve-cube guess x) x)))
+
 (define (cube-root x)
   (cube-root-iter 1.0 x))
+
+(cube-root 9)
 ;; 4. Draw the environment diagram for (f add1 3) given
 
 ;;     (define (f x y)
@@ -76,7 +81,6 @@
 ;;           (list x1 x2 x3 x4)
 ;;    returns
 ;;           (10 3 6 20)
-(list '(10 3 6 20))
 ;;    In addition, the primitive function cons takes two arguments -- a number new, and a list lst, and
 ;;    returns the list formed by inserting new at the front of lst.  Thus (cons 10 (list 3 6 20)) returns
 ;;    (10 3 6 20).  
@@ -100,7 +104,7 @@
 (define min-5
   (lambda (a b c d e)
       (min-2 a (min-4 b c d e))))
-
+; MIN HELPER FUNCTIONS^
 (define sortFive
   (lambda (a b c d e)
     (let ((m1 (min-5 a b c d e)))
@@ -131,8 +135,11 @@
       (cond
         ((= m1 a) (cons a b))
         ((= m1 b) (cons b a))))))
-
-(sortTwo 1 2)
+; INSTEAD of using recursion, we can call smaller sort functions that support fewer parameters.
+; sortFive calls sortFour, sortThree, etc.
+(sortFive 1 4 3 9 5)
+(sortFive 9 5 3 8 8)
+; sortFive tested and works for all cases
 
     
 
