@@ -2,7 +2,6 @@
 ; Homework 2
 ; Spring 2024
 
-
 ;; 1. Show how (logical) OR can be implemented using COND
 (define or*
   (lambda (x y)
@@ -66,7 +65,6 @@
 (define (cube-root x)
   (cube-root-iter 1.0 x))
 
-(cube-root 9)
 ;; 4. Draw the environment diagram for (f add1 3) given
 
 ;;     (define (f x y)
@@ -74,7 +72,7 @@
 ;;
 ;;     (define (add1 x)
 ;;       (+ x 1))
-
+; [DONE ON DRAWING IN SEPARATE FOLDER]
 
 ;; 5. The primitive function list takes a finite number of numbers (say x1, x2, ..., xk) and returns the list
 ;;    (x1 x2 ... xk) of these numbers in the same order.  Thus if x1 = 10, x2 = 3, x3 = 6, and x4 = 20, the call
@@ -140,8 +138,6 @@
 (sortFive 1 4 3 9 5)
 (sortFive 9 5 3 8 8)
 ; sortFive tested and works for all cases
-
-    
 
 
 
