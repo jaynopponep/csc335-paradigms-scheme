@@ -22,10 +22,6 @@
       ((< n 3) n)
     (else
      (+ (f-rec (- n 1)) (* 2 (f-rec (- n 2))) (* 3 (f-rec (- n 3))))))))
-<<<<<<< HEAD
-(f-rec 5)
-=======
->>>>>>> refs/remotes/origin/main
     
 ;; Iterative process:
 (define i-rec
@@ -39,15 +35,9 @@
       ((= n 2) c)
       (else
        (rec-iter b c (+ c (* 2 b) (* 3 a)) (- n 1))))))
-<<<<<<< HEAD
-(i-rec 5)
-
-;; 1.12
-=======
 (i-rec 4)
 
 ;; 1.12:
->>>>>>> refs/remotes/origin/main
       
 ; 2.  Write iterative and recursive scheme programs to test whether the digits in a non-negative
 ; integer are in increasing order.  For example, the digits of 12348 are in increasing order, while
