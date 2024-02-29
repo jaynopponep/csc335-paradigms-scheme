@@ -72,19 +72,15 @@
 
 ;; 2. Develop and certify iterative and recursive scheme functions to return the sum of the
 ;; digits within a non-negative integer.  For example, (sum-of-digits 345) is 12.
-; IH: We are inducting on # of digits in n, if the n >= 0 is an integer, then the recursive call will retrun the correct result
-; BASIS: Return n when n is a 1-digit nonnegative integer
-; IS
-
 (define sum-of-digits
   (lambda (x)
     (cond
-      ((zero? (quotient x 10)) x)
+      ((zero? (floor (/ x 10))) x)
       (else
-       (+ (modulo x 10) (sum-of-digits (quotient x 10)))))))
+       (+ (modulo x 10) (sum-of-digits (floor (/ x 10)))))
+       )))
 
-(sum-of-digits 3499)
 
-; GI, Strong-enough test, Weak-enough test, Preservability.
-; GI => n = NYP * 10^(# of digits in AP) + AP
-; so if NYP = 0, n = AP
+(sum-of-digits 34)
+
+

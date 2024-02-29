@@ -143,7 +143,7 @@
   (lambda (n)
     (+ 1 (floor (/ (log n) (log 10))))))
 (count 1000)
-f
+
 
 
       
