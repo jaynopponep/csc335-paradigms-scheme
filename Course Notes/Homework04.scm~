@@ -24,18 +24,18 @@
      (+ (f-rec (- n 1)) (* 2 (f-rec (- n 2))) (* 3 (f-rec (- n 3))))))))
     
 ;; Iterative process:
-(define f
+(define i-rec
   (lambda (n)
-    (f-iter 0 1 2 n)))
-(define f-iter
+    (rec-iter 0 1 2 n)))
+(define rec-iter
   (lambda (a b c n)
     (cond
       ((= n 0) a)
       ((= n 1) b)
       ((= n 2) c)
       (else
-       (f-iter b c (+ c (* 2 b) (* 3 a)) (- n 1))))))
-(f 3)
+       (rec-iter b c (+ c (* 2 b) (* 3 a)) (- n 1))))))
+(i-rec 4)
 
 ;; 1.12:
       

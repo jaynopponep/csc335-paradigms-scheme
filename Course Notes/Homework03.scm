@@ -63,6 +63,9 @@
 
 ; the above my-plus-version is iterative/tail-recursive
 
+
+
+
 ;; Certify each procedure, using the appropriate technique, as determined
 ;; by your answer to the classification question above: for the recursive
 ;; procedure, give a proof based on the size of (one of) the arguments; for
@@ -77,14 +80,17 @@
 ; IS
 
 (define sum-of-digits
-  (lambda (x)
+  (lambda (n)
     (cond
-      ((zero? (quotient x 10)) x)
+      ((zero? (quotient n 10)) n)
       (else
-       (+ (modulo x 10) (sum-of-digits (quotient x 10)))))))
+       (+ (modulo n 10) (sum-of-digits (quotient n 10)))))))
 
-(sum-of-digits 3499)
+(sum-of-digits 1234)
 
-; GI, Strong-enough test, Weak-enough test, Preservability.
-; GI => n = NYP * 10^(# of digits in AP) + AP
-; so if NYP = 0, n = AP
+; GI:
+
+; i) n = NYP * 10^(# of digits in AP) + AP
+; Example: If NYP = 12, AP = 34, then n = 12 * 10^(2) + 34 => n = 1200 + 34 => n = 1234
+; ii) result = sum of digits in AP
+; iii) STOP when NYP = 0, which yields n = AP
