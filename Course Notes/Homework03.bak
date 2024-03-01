@@ -75,7 +75,7 @@
 
 ;; 2. Develop and certify iterative and recursive scheme functions to return the sum of the
 ;; digits within a non-negative integer.  For example, (sum-of-digits 345) is 12.
-; IH: We are inducting on # of digits in n, if the n >= 0 is an integer, then the recursive call will return the correct result
+; IH: We are inducting on # of digits in n, if the n >= 0 is an integer, then the recursive call will retrun the correct result
 ; BASIS: Return n when n is a 1-digit nonnegative integer
 ; IS
 
@@ -90,33 +90,7 @@
 
 ; GI:
 
-;; i) n = NYP * 10^(# of digits in AP) + AP
+; i) n = NYP * 10^(# of digits in AP) + AP
 ; Example: If NYP = 12, AP = 34, then n = 12 * 10^(2) + 34 => n = 1200 + 34 => n = 1234
-;; ii) result = sum of digits in AP
-;; iii) STOP when NYP = 0, which yields n = AP
-; Some variables we should use: n, nyp, ap, result
-
-(define sum-digits
-  (lambda (n)
-    (sum-iter n n 0)))
-
-(define sum-iter
-  (lambda (n nyp result)
-    (cond ((zero? nyp) result)
-          (else
-           (sum-iter n (quotient nyp 10) (+ (modulo nyp 10) result))))))
-(sum-digits 16)
-
-; i) n = NYP * 10^(#dig AP) + AP ====> 16 = 16 * 10^0 + 0 =====> 16 = 1 * 10^(1) + 6 => 16 = 10+6 TRUE
-; ii) result = sum of digits TRUE
-; iii) zero? nyp returns result, which checks NYP = 0.
-;; STRONG ENOUGH? Yes, when NYP has become 0, our program returns result which is the AP; in other words, result = AP, NYP = 0. 
-;; WEAK ENOUGH? Yes, at the first call (sum-digits 16), n=16, NYP=16, AP=0, our equation would be true since 16 = 16 * 10^(0) + 0 => 16 = 16 is TRUE
-;; PRESERVES? Yes, n = NYP*10^(# of AP digits) + AP remains true through all iterations. For example, after the second call, n=16, NYP=1, AP=6: 16 = 1 * 10^1 + 6 => 16=16 is TRUE
-; And also the final call will be when n=16, NYP=0, AP=16: 16 = 0 * 10^2 + 16 => 16=16 is TRUE. At the stopping condition when NYP = 0, we also return result which is practically our AP. 
-
-
-
-
-
-
+; ii) result = sum of digits in AP
+; iii) STOP when NYP = 0, which yields n = AP
