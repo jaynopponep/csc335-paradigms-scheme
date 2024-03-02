@@ -114,9 +114,8 @@
 ;; WEAK ENOUGH? Yes, at the first call (sum-digits 16), n=16, NYP=16, AP=0, our equation would be true since 16 = 16 * 10^(0) + 0 => 16 = 16 is TRUE
 ;; PRESERVES? Yes, n = NYP*10^(# of AP digits) + AP remains true through all iterations. For example, after the second call, n=16, NYP=1, AP=6: 16 = 1 * 10^1 + 6 => 16=16 is TRUE
 ; And also the final call will be when n=16, NYP=0, AP=16: 16 = 0 * 10^2 + 16 => 16=16 is TRUE. At the stopping condition when NYP = 0, we also return result which is practically our AP. 
-
-
-
+; To add, on each call of NYP, we are dividing nyp by 10 which means it loses its last digit
+; at each iteration, and we must make it up with nyp*10^(digits lost)
 
 
 
