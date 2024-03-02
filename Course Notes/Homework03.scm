@@ -96,16 +96,18 @@
 ;; iii) STOP when NYP = 0, which yields n = AP
 ; Some variables we should use: n, nyp, ap, result
 
+;guess-code:
 (define sum-digits
   (lambda (n)
-    (sum-iter n n 0)))
+    (define sum-iter
+      (lambda (nyp result)
+        (cond ((zero? nyp) result)
+              (else
+               (sum-iter (quotient nyp 10) (+ (modulo nyp 10) result))))))
+    (cond ((zero? n) 0)
+          (else (sum-iter n 0)))))
 
-(define sum-iter
-  (lambda (n nyp result)
-    (cond ((zero? nyp) result)
-          (else
-           (sum-iter n (quotient nyp 10) (+ (modulo nyp 10) result))))))
-(sum-digits 16)
+(sum-digits 29)
 
 ; i) n = NYP * 10^(#dig AP) + AP ====> 16 = 16 * 10^0 + 0 =====> 16 = 1 * 10^(1) + 6 => 16 = 10+6 TRUE
 ; ii) result = sum of digits TRUE
