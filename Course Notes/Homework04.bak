@@ -82,32 +82,12 @@
         (else (incorder? (quotient n 10)))))
 (incorder? 1234569)
 
-; Pre: n>=0 is an integer
-; Post: Return true if the digits are in increasing order; return false if the digits are in decreasing order
-
-; Design Idea: Keep track of two integers from the end of the integer n. One will be right, which will be the final digit of the integer
-; and one will be left, which is the direct left of the final digit. After each iteration, we will move left to the left one digit, right to the left one digit.
-; At iteration, we must compare left and right. If left > right; return false because this would not be in increasing order; otherwise, we return true.
-; We also would like to have another parameter to keep track of the NYP in order to check if (modulo NYP 10) = 0, then we will return #t because there are no more digits in NYP
-; and all are in AP. All are processed
-
-; GI: Since we are using NYP and AP, we can just say the guess invariant is:
-; i) n = NYP * 10^(#digs in AP) + AP
-; ii) stop when NYP = 0, yielding #t
-; iii) if left > right, we also stop here and return #f immediately
-
 (define (incorder2? n)
-  (define (inc-iter nyp left right)
-    (cond ((zero? (modulo nyp 10)) #t) 
-          ((> left right) #f)
-          (else (inc-iter (quotient nyp 10) (modulo (quotient nyp 10) 10) (modulo nyp 10)))))
-    (cond ((< n 10) #t)
-          (else (inc-iter (quotient n 10) (modulo (quotient n 10) 10) (modulo n 10)))))
-
-(incorder2? 1589)
-(incorder2? 9876)
-(incorder2? 5967)
-(incorder2? 1456)
+  (define (inc-iter prev curr count)
+    ((> prev curr) #f)
+    ((< prev curr) #t)
+    (else )))
+    
 
 
 
