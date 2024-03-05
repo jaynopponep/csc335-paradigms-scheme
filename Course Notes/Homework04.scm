@@ -91,10 +91,22 @@
 ; We also would like to have another parameter to keep track of the NYP in order to check if (modulo NYP 10) = 0, then we will return #t because there are no more digits in NYP
 ; and all are in AP. All are processed
 
+; Termination Idea: stop when NYP = 0, yielding #t. if left > right, we also stop here and return #f immediately
+
 ; GI: Since we are using NYP and AP, we can just say the guess invariant is:
-; i) n = NYP * 10^(#digs in AP) + AP
-; ii) stop when NYP = 0, yielding #t
-; iii) if left > right, we also stop here and return #f immediately
+; n = NYP * 10^(#digs in AP) + AP
+; Throughout each iteration, the AP consists of digits in increasing order.
+
+; STRONG ENOUGH? - Assuming AP represents all the digits in increasing order, when NYP reaches 0 (NYP=0), n=AP,
+; where instead of returning AP, we return either true or false whether AP is entirely increasing order and this is true,
+; it is in increasing order when NYP reaches 0. 
+; WEAK ENOUGH? - At the first call, we expect NYP = n because we have not processed any digits by comparing
+; When we check this with our GI, our AP should be = 0, n = NYP * 10^0 (0 since no digits are processed in AP) + AP -> n = NYP * 1 TRUE!
+; PRESERVES? - After our first call, assume that we are not at either of our stopping conditions.
+; For NYP, we pass NYP without the rightmost digit, move 'left' one digit to the left, and 'right' one digit to the left.
+; This means that we have one new processed digit in AP, meaning 1 less than originally from NYP. Assume NYP was originally 1234, now it is 123.
+; n = 123 * 10^(1) + 4 => n = 1230 + 4 => n = 1234. It preserves.
+
 
 (define (incorder2? n)
   (define (inc-iter nyp left right)
