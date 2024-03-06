@@ -95,7 +95,10 @@
 
 ; GI: Since we are using NYP and AP, we can just say the guess invariant is:
 ; n = NYP * 10^(#digs in AP) + AP
+; n is in sorted order if NYP is in sorted order and AP is in sorted order.
 ; Throughout each iteration, the AP consists of digits in increasing order.
+; EDIT (4/5/24): We'll take AP as a "virtual variable" since it is not directly used in code like NYP, but is defined in our GI
+
 
 ; STRONG ENOUGH? - Assuming AP represents all the digits in increasing order, when NYP reaches 0 (NYP=0), n=AP,
 ; where instead of returning AP, we return either true or false whether AP is entirely increasing order and this is true,
@@ -107,19 +110,20 @@
 ; This means that we have one new processed digit in AP, meaning 1 less than originally from NYP. Assume NYP was originally 1234, now it is 123.
 ; n = 123 * 10^(1) + 4 => n = 1230 + 4 => n = 1234. It preserves.
 
-
+; EDIT (4/5/24): we can possibly optimize the program by removing left since left represents the farthest right of nyp
+; left removed. we extract rightmost digit of NYP directly and use it to compare to 'right'
 (define (incorder2? n)
-  (define (inc-iter nyp left right)
-    (cond ((zero? (modulo nyp 10)) #t) 
-          ((> left right) #f)
-          (else (inc-iter (quotient nyp 10) (modulo (quotient nyp 10) 10) (modulo nyp 10)))))
+  (define (inc-iter nyp right)
+    (cond ((zero? nyp) #t) 
+          ((> (modulo nyp 10) right) #f)
+          (else (inc-iter (quotient nyp 10) (modulo nyp 10)))))
     (cond ((< n 10) #t)
-          (else (inc-iter (quotient n 10) (modulo (quotient n 10) 10) (modulo n 10)))))
+          (else (inc-iter (quotient n 10) (modulo n 10)))))
 
 (incorder2? 1589)
 (incorder2? 9876)
-(incorder2? 5967)
-(incorder2? 1456)
+(incorder2? 12034)
+(incorder2? 145556)
 
 
 
