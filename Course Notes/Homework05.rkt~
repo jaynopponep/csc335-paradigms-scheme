@@ -76,37 +76,24 @@
 (define (rmd n)
   (modulo n 10))
 
-(define (lmd n)
-  (quotient n (expt 10 (- (length n) 1))))
-
-(define (2lmd n)
-  (cond
-    ((< n 10) 1)
-    (else 
-     (rmd (quotient n (expt 10 (- (length n) 2)))))))
-
 (define (ins-sort n)
   (ins-iter n (quotient n 10) (modulo n 10)))
 
   (define (ins-iter n nyp ap)
     (let ((left (rmd nyp)) ; rmd of NYP
           (sorted ap)      ; sorted portion on the right
-          (right (lmd ap))  ; left most of ap 
-          (right2 (2lmd ap))) ; 2nd left most of AP
+          (right (rmd n)))  ; Right most digit of n
       (cond
-        ((zero? nyp) ap)
-        ((> left right) (ins-iter nyp (quotient nyp 10) (make-num (make-num right left) right2)))
-        ((> right right2) (ins-iter n (make-num sorted right) sorted))
+        ((zero? (rmd nyp)) (make-num right sorted))
+        ((> left right) (ins-iter (quotient n 100) (quotient nyp 100) (make-num right left)))
         (else
-         (ins-iter nyp (quotient nyp 10) (make-num left sorted))))))
-
-(ins-sort 6251)
-;Problem: Need a left-most digit function? 5 must compare with 3. maybe (quotient sorted (length sorted))
+         (ins-iter (quotient n 10) (quotient nyp 10) (make-num right sorted))))))
+(ins-sort 12543) ;Problem: Need a left-most digit function? 5 must compare with 3. maybe (quotient sorted (length sorted))
 
 ; 1 2 4 3
 
-; -> Selection sort
 
+; -> Selection sort
 
 
 
