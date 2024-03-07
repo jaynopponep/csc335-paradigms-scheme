@@ -22,15 +22,3 @@
 ;; Use only functions and numbers -- no lists, no strings, no vectors ...
 
 ;; Be sure to provide specifications for your functions. 
-
-; Pre: m >= 0 & n >= 0 are integers
-; Post: Return sorted values that are in m and n merged
-; Design Idea: Best way is to start scanning each from the right and comparing
-; the rightmost digits of m & n. If (mod n 10) < (mod m 10), add (mod m 10) to the solution.
-; We will also need a counter for 10^(count) because everytime we are modding m or n,
-; we must add (10^count*m) (in the case we are adding m to the solution)
-; We will start count at 0 because when we are at the rightmost digit, we dont want to multiply
-; the digit by 10.
-
-
-
