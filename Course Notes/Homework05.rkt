@@ -1,0 +1,76 @@
+#lang racket
+
+;Homework Set 5
+
+; 1) Recursive and iterative procedures to decide whether an integer n>=0
+; is sorted in non-decreasing order from left -> right
+
+; Pre: n>=0 is an integer
+; Post: Return true if the digits are in increasing order; return false if the digits are in decreasing order
+
+; Design Idea: Keep track of two integers from the end of the integer n. One will be right, which will be the final digit of the integer
+; and one will be left, which is the direct left of the final digit. After each iteration, we will move left to the left one digit, right to the left one digit.
+; At iteration, we must compare left and right. If left > right; return false because this would not be in increasing order; otherwise, we return true.
+; We also would like to have another parameter to keep track of the NYP in order to check if (modulo NYP 10) = 0, then we will return #t because there are no more digits in NYP
+; and all are in AP. All are processed
+
+; Termination Idea: stop when NYP = 0, yielding #t. if left > right, we also stop here and return #f immediately
+
+; GI: Since we are using NYP and AP, we can just say the guess invariant is:
+; n = NYP * 10^(#digs in AP) + AP
+; n is in sorted order if NYP is in sorted order and AP is in sorted order.
+; Throughout each iteration, the AP consists of digits in increasing order.
+; EDIT (4/5/24): We'll take AP as a "virtual variable" since it is not directly used in code like NYP, but is defined in our GI
+
+
+; STRONG ENOUGH? - Assuming AP represents all the digits in increasing order, when NYP reaches 0 (NYP=0), n=AP,
+; where instead of returning AP, we return either true or false whether AP is entirely increasing order and this is true,
+; it is in increasing order when NYP reaches 0. 
+; WEAK ENOUGH? - At the first call, we expect NYP = n because we have not processed any digits by comparing
+; When we check this with our GI, our AP should be = 0, n = NYP * 10^0 (0 since no digits are processed in AP) + AP -> n = NYP * 1 TRUE!
+; PRESERVES? - After our first call, assume that we are not at either of our stopping conditions.
+; For NYP, we pass NYP without the rightmost digit, move 'left' one digit to the left, and 'right' one digit to the left.
+; This means that we have one new processed digit in AP, meaning 1 less than originally from NYP. Assume NYP was originally 1234, now it is 123.
+; n = 123 * 10^(1) + 4 => n = 1230 + 4 => n = 1234. It preserves.
+
+; EDIT (4/5/24): we can possibly optimize the program by removing left since left represents the farthest right of nyp
+; left removed. we extract rightmost digit of NYP directly and use it to compare to 'right'
+(define (incorder2? n)
+  (define (inc-iter nyp right)
+    (cond ((zero? nyp) #t) 
+          ((> (modulo nyp 10) right) #f)
+          (else (inc-iter (quotient nyp 10) (modulo nyp 10)))))
+    (cond ((< n 10) #t)
+          (else (inc-iter (quotient n 10) (modulo n 10)))))
+
+(incorder2? 1589)
+(incorder2? 9876)
+(incorder2? 12034)
+(incorder2? 145556)
+
+; 2) Recursive and iterative procedures to return the number formed from an integer
+; n >= 0 by sorting the digits of n
+; -> Insertion sort
+; Pre: n>=0 is an integer
+; Post: Return a sorted 'n' sorted with insertion sort
+; DESIGN IDEA: Start scanning from the right. If the right digit is less than the left of it,
+; swap the digits by using let to assign temp to one of the digits.
+; Make sure after swapping, check if the current right digit is less than the right of the
+; current right digit. If not swap them, and then continue doing so.
+; Termination: Once we reach left = 0, return 0
+
+; GI: n=NYP*10^(#digs in AP) + AP
+
+(define (ins-sort n)
+  (let ((left (modulo (quotient n 10) 10))))
+  (let ((right (modulo n 10))))
+  (cond
+    ((zero? left) 0)
+    ((< left right) (ins-sort (quotient n 10)))
+    (else (ins-sort (
+
+(ins-sort 285394)
+; -> Selection sort
+
+
+
