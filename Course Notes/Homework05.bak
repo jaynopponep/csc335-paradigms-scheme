@@ -43,6 +43,10 @@
     (cond ((< n 10) #t)
           (else (inc-iter (quotient n 10) (modulo n 10)))))
 
+(incorder2? 1589)
+(incorder2? 9876)
+(incorder2? 12034)
+(incorder2? 145556)
 
 ; 2) Recursive and iterative procedures to return the number formed from an integer
 ; n >= 0 by sorting the digits of n
@@ -53,46 +57,19 @@
 ; swap the digits by using let to assign temp to one of the digits.
 ; Make sure after swapping, check if the current right digit is less than the right of the
 ; current right digit. If not swap them, and then continue doing so.
-; Termination: Once we reach left = 0, return AP which includes all of the non-decreasing order sorted digits
+; Termination: Once we reach left = 0, return 0
 
 ; GI: n=NYP*10^(#digs in AP) + AP
 
-;Helper functions:
-; Pre: n>=0 is an integer
-; Post: Return length of n
-(define (length n)
-  (cond ((< n 10) 1)
-        (else (+ 1 (length (/ n 10))))))
-
-; make-number function that utilizes length to figure out our index/step
-; Pre: p >= 0, q >= 0 are integers
-; Post: Return [p][q]
-(define (make-num p q)
-  (+ q (* p (expt 10 (length q)))))
-
-; right-most digit for readability:
-; Pre: n >= 0
-; Post: return the right most digit of n. This can be 0, which means that the rightmost digit is itself
-(define (rmd n)
-  (modulo n 10))
-
 (define (ins-sort n)
-  (ins-iter n (quotient n 10) (modulo n 10)))
+  (let ((left (modulo (quotient n 10) 10))))
+  (let ((right (modulo n 10))))
+  (cond
+    ((zero? left) 0)
+    ((< left right) (ins-sort (quotient n 10)))
+    (else (ins-sort (
 
-  (define (ins-iter n nyp ap)
-    (let ((left (rmd nyp)) ; rmd of NYP
-          (sorted ap)      ; sorted portion on the right
-          (right (rmd n)))  ; Right most digit of n
-      (cond
-        ((zero? (rmd nyp)) (make-num right sorted))
-        ((> left right) (ins-iter (quotient n 100) (quotient nyp 100) (make-num right left)))
-        (else
-         (ins-iter (quotient n 10) (quotient nyp 10) (make-num right sorted))))))
-(ins-sort 12543) ;Problem: Need a left-most digit function? 5 must compare with 3. maybe (quotient sorted (length sorted))
-
-; 1 2 4 3
-
-
+(ins-sort 285394)
 ; -> Selection sort
 
 
