@@ -1,20 +1,25 @@
-
-; Fifth Homework Set
+#lang racket
+; Sixth Homework Set
 ; CSc 335
 ; Spring 2024
-
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 ; Here are some additional practice problems
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 ; Write a program to reverse the digits of an integer.  Thus 1234 --> 4321.
 ; Note that the output is a number!
-
 ; You will need to work out a precise specification: what if there are 0s?
+; Pre: n >= 0 is an integer; no leading and trailing zeroes
+; Post: Return n in reverse
+(define (length n)
+  (cond ((< n 10) 1)
+        (else (+ 1 (length (/ n 10))))))
+(define (make-num p q)
+  (cond ((zero? p) q)
+        ((zero? q) p)
+        (else (+ p (* q (expt 10 (length p)))))))
+(define (reverse-digs n)
+  (cond ((< n 10) n)
+        (else (make-num (reverse-digs (quotient n 10)) (modulo n 10)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

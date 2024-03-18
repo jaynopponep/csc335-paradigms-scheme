@@ -1,4 +1,4 @@
-it#lang racket
+#lang racket
 ; Fourth Homework Set
 ; CSc 335
 ; Spring 2024
@@ -70,6 +70,14 @@ it#lang racket
 
 
 ;; 1.12:
+(define (pascal row col)
+  (cond ((zero? col) 1)
+        ((zero? row) 1)
+        ((equal? col row) 1)
+        (else
+         (+ (pascal (- row 1) (- col 1))
+            (pascal (- row 1) col)))))
+
       
 ; 2.  Write iterative and recursive scheme programs to test whether the digits in a non-negative
 ; integer are in increasing order.  For example, the digits of 12348 are in increasing order, while
