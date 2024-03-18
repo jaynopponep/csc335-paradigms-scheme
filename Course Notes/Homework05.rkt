@@ -68,7 +68,17 @@
 ; Pre: p >= 0, q >= 0 are integers
 ; Post: Return [p][q]
 (define (make-num p q)
-  (+ q (* p (expt 10 (length q)))))
+  (cond ((zero? q) p)
+        ((zero? p) q)
+        ((> p q) (+ p (* q (scale q))))
+        (else (+ q (* p (scale q))))))
+
+(define (scale x)
+  (expt 10 (length x)))
+
+(define (lmd x)
+  (rmd (quotient x (/ (scale x) 10))))
+  
 
 ; right-most digit for readability:
 ; Pre: n >= 0
@@ -77,20 +87,23 @@
   (modulo n 10))
 
 (define (ins-sort n)
-  (ins-iter n (quotient n 10) (modulo n 10)))
+  (ins-iter n (quotient n 10) 0))
 
   (define (ins-iter n nyp ap)
-    (let ((left (rmd nyp)) ; rmd of NYP
-          (sorted ap)      ; sorted portion on the right
-          (right (rmd n)))  ; Right most digit of n
-      (cond
-        ((zero? (rmd nyp)) (make-num right sorted))
-        ((> left right) (ins-iter (quotient n 100) (quotient nyp 100) (make-num right left)))
-        (else
-         (ins-iter (quotient n 10) (quotient nyp 10) (make-num right sorted))))))
-(ins-sort 12543) ;Problem: Need a left-most digit function? 5 must compare with 3. maybe (quotient sorted (length sorted))
+ (cond
+    ((zero? nyp) (make-num n ap))
+    (else (let ((left (rmd nyp)) ; rmd of NYP
+                (right (rmd n)) ; Right most digit of n
+                (lmap (lmd ap)))
+            (cond
+              ((> left right) (ins-iter (make-num (quotient nyp 10) right) (quotient nyp 10) (ins-iter (make-num left ap) (quotient (make-num left ap) 10) 0)))
+              (else (ins-iter (quotient n 10) (quotient nyp 10) (ins-iter (make-num right ap) (quotient (make-num right ap) 10) 0))))))))
+;(ins-sort 12345)
+(ins-sort 54321)
+;(ins-sort 31452)
+;(ins-sort 13132)
+;(ins-sort 213546)
 
-; 1 2 4 3
 
 
 ; -> Selection sort
