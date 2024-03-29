@@ -35,6 +35,22 @@
 
 ; Abelson and Sussman, Problems 1.29, 1.31, 1.34, 1.37 and 1.38
 
+; 1.29 - Simpson's Rule:
+(define (sum term a next b)
+  (if (> a b) 0
+      (+ (term a)
+         (sum term (next a) next b))))
+(define (simpson f a b n)
+  (define h (/ (- b a) n))
+  (* (/ h 3)
+     (+
+      (f a)
+      (* 4 (sum f a  
+      (* 2 (
+      (f b)
+      
+
+
 ; Abelson and Sussman, Problems 1.41, 1.42, and 1.43
 
 
