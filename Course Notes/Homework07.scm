@@ -28,9 +28,6 @@
        (+ 1 (my-length (cdr lst)))))))
 (my-length '(a b c d))
 
-; Iterative solution
-
-
 ; 2. Write your own version of list-ref using the list functions we have discussed.  
 
 ; Briefly, the idea is indicated by this example:  (my-list-ref '(a b c d) 2) = c.  Note the 0-based
@@ -58,11 +55,31 @@
 ; Are we allowing the use of length? Or can we not use helper functions !
 ; If we are able to use helper functions, we would simply use the length, and then subtract (- length num),
 ; and then keep recursively calling the function until we reach (zero? (- length num))
-
+(define (but-last lst num)
+  (let ((len (my-length lst)))
+    (cond
+      ((zero? (- len num)) '())
+      (else
+       (cons (car lst) (but-last (cdr lst) num))))))
 
 ; 5.  Write a function end that takes two arguments, lst and num, and returns the last num
 ; elements of lst.
 
+; This is practically the opposite of the but-last function, where we get all of the numbers
+; except the last num numbers in a list.
+; Here, we want THOSE last numbers in the list to print out.
+; In the but-last function, we checked if - len num is 0, and when we did we ended the iteration and returned the null list
+; Instead, we will return car AND cdr of the list at that point when (- len num) = 0. 
+
+(define (end lst num)
+  (let ((len (my-length lst)))
+    (cond
+      ((zero? (- len num)) lst)
+      (else
+       (end (cdr lst) num)))))
+
+(end '(a b c d e f) 1)
+  
 
 
 ; References:
