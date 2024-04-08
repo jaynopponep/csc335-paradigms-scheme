@@ -80,10 +80,15 @@
   (cond ((zero? (quotient n 10)) n)
         (else (ld (quotient n 10)))))
 
-
 ; Precondition: n is a non-negative integer
 ; Postcondition: returns the rightmost digit of n
 (define (rd n) (modulo n 10))
+
+;Precondition: n is a non-negative integer:
+; Postcondition: returns second left most digit of n
+(define (ld2 n)
+  (cond ((zero? (quotient n 100)) (modulo n 10))
+        (else (ld2 (quotient n 10))))) 
 
 
 ; Valid LD number?
@@ -93,23 +98,39 @@
 ; Design Idea: All we need to do is check if n starts with and 1 and ends with a 2.
 (define (valid-LD? n)
   (cond ((< n 102) #f) 
-        ((not (and (= (ld n) 1) (= (rd 2)))) #f)
+        ((not (and (= (ld n) 1) (= (rd n) 2))) #f)
         (else #t)))
 
 ; simple length function:
 (define (length n)
   (cond ((< n 10) 1)
         (else (+ 1 (length (/ n 10))))))
+
+; Readability helper functions:
+; one? function that checks if an integer n is one
+(define (one? n)
+  (= n 1))
+; two? function that checks if an integer n is two
+(define (two? n)
+  (= n 2))
+
+; Make-num function to build our LD-elements:
+(define (make-num p q)
+  (+ q (* p (expt 10 (length q)))))
 ; Main function:
 ; An iterative function that will process all of the possible combinations of LD-elements
 ; given an LD-number and then count only the ones that are valid into variable 'elements'
 ; and return elements.
+; The idea is to not exactly build the entire LD-number, but understand how many lp and rp's are used
+; in each combination 
 
 (define (possible-LD-elements n)
-  (define (possible-iter))
-  (possible-iter n (ld n)
-
-
+  (if (valid-LD? n)
+      (possible-iter n (ld n) (ld2 n) (ld n) 1 0)
+      0))
+  
+(define (possible-iter n curr next result lp rp)
+  (cond 
 
 
 
