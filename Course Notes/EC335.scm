@@ -54,21 +54,24 @@
 ; Otherwise, if it is the number 2 itself, we simply return 0 since it's not
 ; a valid LD element. 
 
+; Helper Functions:
+; Precondition: n is a non-negative integer
+; Post-condition: returns the leftmost digit of n
+(define (ld n)
+  (cond ((zero? (quotient n 10)) n)
+        (else (ld (quotient n 10)))))
+
+
+; Precondition: n is a non-negative integer
+; Postcondition: returns the rightmost digit of n
+(define (rd n) (modulo n 10))
+
 
 ; Valid LD number?
 ; Precondition: n is a non-negative integer.
 ; Postcondition: returns true if n represents a valid LD number and false otherwise
 
 ; Design Idea: All we need to do is check if n starts with an 1 and ends with a 2.
-
-; Helper Functions:
-
-(define (ld n)
-  (cond ((zero? (quotient n 10)) n)
-        (else (ld (quotient n 10)))))
-
-(define (rd n) (modulo n 10))
-
 (define (valid-LD? n)
   (cond ((< n 102) #f) 
         ((not (and (= (ld n) 1) (= (rd 2)))) #f)
