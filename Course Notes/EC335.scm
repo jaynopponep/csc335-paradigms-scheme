@@ -55,6 +55,25 @@
 ; a valid LD element. 
 
 
+; Valid LD number?
+; Precondition: n is a non-negative integer.
+; Postcondition: returns true if n represents a valid LD number and false otherwise
+
+; Design Idea: All we need to do is check if n starts with an 1 and ends with a 2.
+
+; Helper Functions:
+
+(define (ld n)
+  (cond ((zero? (quotient n 10)) n)
+        (else (ld (quotient n 10)))))
+
+(define (rd n) (modulo n 10))
+
+(define (valid-LD? n)
+  (cond ((< n 102) #f) 
+        ((not (and (= (ld n) 1) (= (rd 2)))) #f)
+        (else #t)))
+
 ; 
 ; 181121322156122
 ; (8 (1 2 (3))(5 6 1))
