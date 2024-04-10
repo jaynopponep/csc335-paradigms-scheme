@@ -131,7 +131,7 @@
 (define (search-one n)
   (cond ((zero? n) 0)
         ((not (one? (rmd n))) (search-one (quotient n 10)))
-        (else ((one? (rmd n)) (+ 1 (check-complement (quotient n 10)) (search-one (quotient n 10)))))))
+        (else (+ 1 (check-complement (quotient n 10)) (search-one (quotient n 10))))))
         
                            
 ; Function: check-complement
@@ -145,9 +145,22 @@
 
 (define (get-elements n)
   (search-2-iter (remove-crust n) (rmd (remove-crust n)) 1))
+; We use quotient n 100 to avoid all empty lists. it doesn't even matter at all what is next to the current 2.
 (define (search-2-iter n rmd-of-n LD-elements)     ; n = crust-removed version of n, rmd-of-n = tracking right most digit of n, LD-elements = count of LD-elements
-  (cond ((two? rmd-of-n) (search-one (quotient n 100)))  ; We use quotient n 100 to avoid all empty lists. it doesn't even matter at all what is next to the current 2.
-        
+  (cond ((zero? n) LD-elements)
+        ((not (two? rmd-of-n)) (search-2-iter (quotient n 10) (rmd (quotient n 10)) LD-elements))
+        (else (+ (search-one (quotient n 100)) (search-2-iter (quotient n 100) (rmd (quotient n 100)) LD-elements)))))
+;(get-elements 181121322156122) ; 37
+(get-elements 11112222) ; 14
+;(get-elements 10101012020202) ; 14
+;(get-elements 111152222) ; 20
+;(get-elements 11111522222) ; 70
+;(get-elements 1111122222) ; 50
+;(get-elements 121224232) ; 3
+;(get-elements 11022) ; 2
+;(get-elements 11822) ; 2
+;(get-elements 1122) ; 1
+;(get-elements 1121212122) ; my personal test case, 9
 
 
 
