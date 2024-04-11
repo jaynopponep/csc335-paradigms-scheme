@@ -31,24 +31,27 @@
 ; Helper function: remove-crust
 ; Precondition: n>=0 is an integer that passes the precondition
 ; Postcondition: Return n, but without the far left 1 and far right 2.
-;;Note this function will require a length, which I have pre-written above since
-;;this is seems to be a common-use function throughout the course.
+
+; ;; Note this function will require a length, which I have pre-written above since
+; ;; this is seems to be a common-use function throughout the course.
+
 (define (remove-crust n)
   (quotient (modulo n (expt 10 (- (length n) 1))) 10))
 
 ; Once we've removed "the crust" of the LD-number, we can start iterating from the right
 ; to the left. Whenever we approach a 2, we need to call a recursive function that will
 ; thus search for a 1 to pair with it. Note that the first step is completely skipped
-; in order to avoid counting the empty list into our counter 'LD-elements' since empty
+; in order to avoid counting the empty list into a counter named 'LD-elements,' since empty
 ; lists are not allowed.
+
 ; This recursive call will terminate when there are no more 1s that we can pair the 2 with.
 ; Once this recursive call terminates, the iterative call will in turn continue looking for
 ; more 2s and then do exactly the same thing over again. The iterative call itself will terminate
 ; once there are no more elements to even iterate through.
 
 ; Specifically within the design, the iterative function will keep track of the variable
-; LD-elements which will increment each time we have found a pair of 1s and 2s.
-; So once the recursive call that we call within the iterative function is done, we should have
+; 'LD-elements' which will increment each time we have found a pair of 1s and 2s.
+; Once the recursive call that we call within the iterative function is done, we should have
 ; an updated value for LD-elements for each iteration. At the same time that the iterative function
 ; updates its LD-elements, it also updates n to be smaller, without the number "2" that we
 ; have now finished dealing with in the recursive function.
@@ -91,8 +94,8 @@
 
 ; HOW DO WE HANDLE DUPLICATES?
 ; We actually do NOT need to worry about duplicates. For example, let's refer to the original
-; LD-number 1212121212 (post-remove-crust)
-; Eventually when we iterate to the 2nd '1' from the left, we form a LD-element: 12(212121)
+; LD-number 1212121212 ( AFTER applying remove-crust)
+; Eventually when we iterate to the second '1' from the left, we form a LD-element: 12(212121)
 ; If we perform what is basically in-grouping, where we group within an already found group,
 ; we would call the iterative function (search-2 212121) when we discover a group to search within it.
 ; This then will result in 12(2(21)1) because it has found a matching pair. No other combinations are found.
@@ -145,11 +148,17 @@
 
 (define (get-elements n)
   (search-2-iter (remove-crust n) (rmd (remove-crust n)) 1))
+
 ; We use quotient n 100 to avoid all empty lists. it doesn't even matter at all what is next to the current 2.
+
 (define (search-2-iter n rmd-of-n LD-elements)     ; n = crust-removed version of n, rmd-of-n = tracking right most digit of n, LD-elements = count of LD-elements
-  (cond ((zero? n) LD-elements)
-        ((not (two? rmd-of-n)) (search-2-iter (quotient n 10) (rmd (quotient n 10)) LD-elements))
-        (else (+ (search-one (quotient n 100)) (search-2-iter (quotient n 100) (rmd (quotient n 100)) LD-elements)))))
+  (cond ((zero? n) LD-elements)                    ; n = 0, we have finished our count. time to return what we found
+        ((not (two? rmd-of-n)) (search-2-iter (quotient n 10) (rmd (quotient n 10)) LD-elements)) ; we need to keep iterating through n until we start at a 2 as it's rightmost digit
+        (else (+ (search-one (quotient n 100)) (search-2-iter (quotient n 100) (rmd (quotient n 100)) LD-elements))))) ; once we find a 2 as the rightmost digit,
+                                                                                                                       ; we need to search for valid ones (see note on using quotient n 100)
+                                                                                                                       ; and add the number of pairs made with the current 2 and those ones to
+                                                                                                                       ; the pairs found in the next subset of the given LD-number
+
 ;(get-elements 181121322156122) ; 37
 (get-elements 11112222) ; 14
 ;(get-elements 10101012020202) ; 14
@@ -161,7 +170,6 @@
 ;(get-elements 11822) ; 2
 ;(get-elements 1122) ; 1
 ;(get-elements 1121212122) ; my personal test case, 9
-
 
 
 
