@@ -183,7 +183,7 @@
 
 ;(search-pair-iter 12121212 121212 2 2 1)
 ;(get-LD-elements 181121322156122) ; 37
-(get-LD-elements 10101012020202) ; 14
+;(get-LD-elements 10101012020202) ; 14
 (get-LD-elements 11112222) ; 14
 ;(get-LD-elements 11111522222) ; 70
 ;(get-LD-elements 1111122222) ; 50
