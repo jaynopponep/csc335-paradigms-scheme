@@ -146,10 +146,10 @@
         (else (search-2-iter n (rmd n) 0))))
 
 
-(define (get-elements n)
+(define (get-LD-elements n)
   (search-2-iter (remove-crust n) (rmd (remove-crust n)) 1))
 
-; We use quotient n 100 to avoid all empty lists. it doesn't even matter at all what is next to the current 2.
+; Note: We use quotient n 100 to avoid all empty lists. it doesn't even matter at all what is next to the current 2.
 
 (define (search-2-iter n rmd-of-n LD-elements)     ; n = crust-removed version of n, rmd-of-n = tracking right most digit of n, LD-elements = count of LD-elements
   (cond ((zero? n) LD-elements)                    ; n = 0, we have finished our count. time to return what we found
@@ -159,18 +159,28 @@
                                                                                                                        ; and add the number of pairs made with the current 2 and those ones to
                                                                                                                        ; the pairs found in the next subset of the given LD-number
 
-;(get-elements 181121322156122) ; 37
-(get-elements 11112222) ; 14
-;(get-elements 10101012020202) ; 14
-;(get-elements 111152222) ; 20
-;(get-elements 11111522222) ; 70
-;(get-elements 1111122222) ; 50
-;(get-elements 121224232) ; 3
-;(get-elements 11022) ; 2
-;(get-elements 11822) ; 2
-;(get-elements 1122) ; 1
-;(get-elements 1121212122) ; my personal test case, 9
+;(get-LD-elements 181121322156122) ; 37
+(get-LD-elements 11112222) ; 14
+;(get-LD-elements 10101012020202) ; 14
+;(get-LD-elements 111152222) ; 20
+;(get-LD-elements 11111522222) ; 70
+;(get-LD-elements 1111122222) ; 50
+;(get-LD-elements 121224232) ; 3
+;(get-LD-elements 11022) ; 2
+;(get-LD-elements 11822) ; 2
+;(get-LD-elements 1122) ; 1
+;(get-LD-elements 1121212122) ; my personal test case, 9
 
+; Abrar's code
 
+(define (count-LD-elements n))
 
+(define (count-pairs n count)
+  ((cond ((zero? n) count)
+         ((one? n) count-pairs (quotient n 10) (+ count 1))
+         
 
+(define (count-iter n count)
+  (let ((rmd (modulo n 10)) (complement (quotient n 100))
+  ((cond ((zero? n) count)
+         ((two? n) (count-pairs complement) 
