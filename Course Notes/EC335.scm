@@ -151,10 +151,10 @@
   (search-pair-iter (remove-crust n) (quotient (remove-crust n) 100) (rmd (remove-crust n)) (rmd (quotient (remove-crust n) 100)) 1))
 (define (search-pair-iter n n-search-1 2ptr 1ptr LD-elements)
   (cond ((zero? (quotient n 100)) LD-elements)
-        ((not (two? 2ptr)) (search-pair-iter (quotient n 10) (quotient n-search-1 10) (rmd (quotient n 10)) (rmd (quotient n-search-1 10)) LD-elements))
-        ((not (one? 1ptr)) (search-pair-iter n (quotient n-search-1 10) 2ptr (rmd (quotient n-search-1 10)) LD-elements))
+        ((not (two? 2ptr)) (search-pair-iter (slice n) (slice n-search-1) (rmd (slice n)) (rmd (slice n-search-1)) LD-elements))
+        ((not (one? 1ptr)) (search-pair-iter n (slice n-search-1) 2ptr (rmd (slice n-search-1)) LD-elements))
         (else
-         (search-pair-iter (quotient n 10) (quotient n-search-1 10) (rmd (quotient n 10)) (rmd (quotient n-search-1 10)) (+ 1 LD-elements (make-pairs n))))))
+         (search-pair-iter (slice n) (slice n-search-1) (rmd (slice n)) (rmd (slice n-search-1)) (+ LD-elements (make-pairs n n-search-1))))))
 
 ; Helper function: make-pairs
 ; Design Idea: Function make-pairs will basically be a helper function that will find all the pairs within the complement, within the new paired groups
@@ -166,20 +166,24 @@
 ; Base Case: 112 or 122 are the most basic inputs given. Either one will return 1 since only one pair can be created because of the fact
 ; that there are NO complements, and within the paired group (1) or (2), there are no LD-elements within the parentheses 
 (define (make-pairs n complement)
-  (let ((my-comp (quotient complement 10))
+  (let ((my-comp (slice complement))
         (n-length (length n))
-        (my-comp-length (length (my-comp))))
+        (my-comp-length (length (slice complement))))
     (cond (+ (search-pair-iter my-comp (quotient my-comp 100) (rmd my-comp) (rmd (quotient my-comp 100)) 0)
-             (get-LD-elements (modulo n (expt 10 (- n-length my-comp-length)))))))) 
+             (get-LD-elements (modulo n (expt 10 (+ 1 (- n-length my-comp-length))))))))) 
 
-
+; Readability helper function: slice
+; Precond: n >=0 is an integer
+; Postcond: returns a smaller n without the rmd of n
+(define (slice n)
+  (quotient n 10))
+;(get-LD-elements 11112222)
 ;(get-LD-elements 181121322156122) ; 37
-;(get-LD-elements 11112222) ; 14
 ;(get-LD-elements 10101012020202) ; 14
 ;(get-LD-elements 111152222) ; 20
 ;(get-LD-elements 11111522222) ; 70
 ;(get-LD-elements 1111122222) ; 50
-;(get-LD-elements 121224232) ; 3
+(get-LD-elements 121224232) ; 3
 ;(get-LD-elements 11022) ; 2
 ;(get-LD-elements 11822) ; 2
 ;(get-LD-elements 1122) ; 1
