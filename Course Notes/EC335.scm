@@ -154,7 +154,7 @@
         ((not (two? 2ptr)) (search-pair-iter (slice n) (slice n-search-1) (rmd (slice n)) (rmd (slice n-search-1)) LD-elements))
         ((not (one? 1ptr)) (search-pair-iter n (slice n-search-1) 2ptr (rmd (slice n-search-1)) LD-elements))
         (else
-         (search-pair-iter (slice n) (slice n-search-1) (rmd (slice n)) (rmd (slice n-search-1)) (+ LD-elements (make-pairs n n-search-1))))))
+         (search-pair-iter n (slice n-search-1) 2ptr (rmd (slice n-search-1)) (+ LD-elements (make-pairs n n-search-1))))))
 
 ; Helper function: make-pairs
 ; Design Idea: Function make-pairs will basically be a helper function that will find all the pairs within the complement, within the new paired groups
@@ -169,8 +169,9 @@
   (let ((my-comp (slice complement))
         (n-length (length n))
         (my-comp-length (length (slice complement))))
-    (cond (+ (search-pair-iter my-comp (quotient my-comp 100) (rmd my-comp) (rmd (quotient my-comp 100)) 0)
-             (get-LD-elements (modulo n (expt 10 (+ 1 (- n-length my-comp-length))))))))) 
+    (cond ((not (> my-comp-length 2)) 0)
+          (else (+ (search-pair-iter my-comp (quotient my-comp 100) (rmd my-comp) (rmd (quotient my-comp 100)) 0)
+                   (get-LD-elements (modulo n (expt 10 (- n-length my-comp-length)))))))))
 
 ; Readability helper function: slice
 ; Precond: n >=0 is an integer
@@ -183,9 +184,9 @@
 ;(get-LD-elements 111152222) ; 20
 ;(get-LD-elements 11111522222) ; 70
 ;(get-LD-elements 1111122222) ; 50
-(get-LD-elements 1212222) ; 3
+;(get-LD-elements 1212222) ; 3
 ;(get-LD-elements 11022) ; 2
-;(get-LD-elements 11822) ; 2
+(get-LD-elements 11822) ; 2
 ;(get-LD-elements 1122) ; 1
 ;(get-LD-elements 1121212122) ; my personal test case, 9
 
