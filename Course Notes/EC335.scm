@@ -125,42 +125,56 @@
 ; is basically the order of the calls, and how LD-element values are passed to each other to sum up and then return
 ; that final value.
 
-; Let's start coding!
+; Let's start coding!                              
 
-; Function: search-one
-; Precondition: n>=0 is an integer
-; Postcondition: Returns # of 1s that are available in the list n 
-
-(define (search-one n)
-  (cond ((zero? n) 0)
-        ((not (one? (rmd n))) (search-one (quotient n 10)))
-        (else (+ 1 (check-complement (quotient n 10)) (search-one (quotient n 10))))))
-        
-                           
-; Function: check-complement
-; Precondition: n>=0 is an integer
-; Postcondition: If n=0 -> return 0, else return amount of LD-elements within n with the call of get-elements
-
-(define (check-complement n)
-  (cond ((zero? n) 0)
-        (else (search-2-iter n (rmd n) 0))))
-
-
+; Iterative main function:
+; Design Idea: Guard calls the iterative function and the guard makes sure to remove the crust and set LD-elements to 1 since we have by default
+; found a pair by itself.
+; Overall, the iterative function will keep track of two pointers that both look for 2 and 1. Once both have been found, it would call
+; a function create-pair that will create the pair, and be given the complement which will also find pairs within the complement.
+; It will also make sure to process the main pair that we have created by looking into the pair, and calling get-LD-elements on that function again
+; GI: Given that AP includes numbers 2s that are already processed: n = [NYP][AP] and n = NYP * 10^[# of digits in AP] + AP
+; We are not assuming the 1s are already processed because they can be used multiple times with other 2s. However, the main iterative function
+; is completely done with any 2s that it encounters after it is done pairing with it.
+; We terminate the iterative function when n is a 2 digit number. Even if it is a 1 and 2, this would create an empty list, which we do not count,
+; so it'll be completely unnecessary to even iterate through the final 2 digit numbers. So once ((zero? (quotient n 100)) is true, then exit the program
+; and return LD-elements
+; Is the GI:
+; Strong enough? We spoke about the termination idea just now, which can be used in the strong enough test. If we have our original number post-crusting:
+; 12, we would in total have LD-elements = 1 for the crusting, and the program will see (quotient 12 100) = 0, so NYP = 0 at this point.
+; Weak enough? If we have a number 1122 which passes the precond, we would initialize LD-elements to 1 when we pass it through to the iterative function.
+; New n becomes 12 and LD-element = 1. 
+; Preserved? Given a number 1122 post-crusting, it is entirely NYP by default. Once it finds the first 2 and then the 1, it is not done processing until reaching
+; the final 1. Once this has been done, 112 is NYP, and the far right 2 is AP. We will never revisit this specific 2 to check if it is a 2.
+; So let's check: n = 112 * 10^[1] + 2 = 112 * 10 + 2 = 1120 + 2 = 1122. 
 (define (get-LD-elements n)
-  (search-2-iter (remove-crust n) (rmd (remove-crust n)) 1))
+  (search-pair-iter (remove-crust n) (quotient (remove-crust n) 100) (rmd (remove-crust n)) (rmd (quotient (remove-crust n) 100)) 1))
+(define (search-pair-iter n n-search-1 2ptr 1ptr LD-elements)
+  (cond ((zero? (quotient n 100)) LD-elements)
+        ((not (two? 2ptr)) (search-pair-iter (quotient n 10) (quotient n-search-1 10) (rmd (quotient n 10)) (rmd (quotient n-search-1 10)) LD-elements))
+        ((not (one? 1ptr)) (search-pair-iter n (quotient n-search-1 10) 2ptr (rmd (quotient n-search-1 10)) LD-elements))
+        (else
+         (search-pair-iter (quotient n 10) (quotient n-search-1 10) (rmd (quotient n 10)) (rmd (quotient n-search-1 10)) (+ 1 LD-elements (make-pairs n))))))
 
-; Note: We use quotient n 100 to avoid all empty lists. it doesn't even matter at all what is next to the current 2.
+; Helper function: make-pairs
+; Design Idea: Function make-pairs will basically be a helper function that will find all the pairs within the complement, within the new paired groups
+; and sum them up and return it to the search-pair-iter for accumulation.
+; Precondition: n>=0 is an integer where (rmd n) is a 2 only.
+; Postcondition: returns a NUMERICAL value that represents number of LD-elements existing in complement and first discovered paired group.
+; IH: 
+; IS:
+; Base Case: 112 or 122 are the most basic inputs given. Either one will return 1 since only one pair can be created because of the fact
+; that there are NO complements, and within the paired group (1) or (2), there are no LD-elements within the parentheses 
+(define (make-pairs n complement)
+  (let ((my-comp (quotient complement 10))
+        (n-length (length n))
+        (my-comp-length (length (my-comp))))
+    (cond (+ (search-pair-iter my-comp (quotient my-comp 100) (rmd my-comp) (rmd (quotient my-comp 100)) 0)
+             (get-LD-elements (modulo n (expt 10 (- n-length my-comp-length)))))))) 
 
-(define (search-2-iter n rmd-of-n LD-elements)     ; n = crust-removed version of n, rmd-of-n = tracking right most digit of n, LD-elements = count of LD-elements
-  (cond ((zero? n) LD-elements)                    ; n = 0, we have finished our count. time to return what we found
-        ((not (two? rmd-of-n)) (search-2-iter (quotient n 10) (rmd (quotient n 10)) LD-elements)) ; we need to keep iterating through n until we start at a 2 as it's rightmost digit
-        (else (+ (search-one (quotient n 100)) (search-2-iter (quotient n 100) (rmd (quotient n 100)) LD-elements))))) ; once we find a 2 as the rightmost digit,
-                                                                                                                       ; we need to search for valid ones (see note on using quotient n 100)
-                                                                                                                       ; and add the number of pairs made with the current 2 and those ones to
-                                                                                                                       ; the pairs found in the next subset of the given LD-number
 
 ;(get-LD-elements 181121322156122) ; 37
-(get-LD-elements 11112222) ; 14
+;(get-LD-elements 11112222) ; 14
 ;(get-LD-elements 10101012020202) ; 14
 ;(get-LD-elements 111152222) ; 20
 ;(get-LD-elements 11111522222) ; 70
@@ -173,14 +187,14 @@
 
 ; Abrar's code
 
-(define (count-LD-elements n))
+;(define (count-LD-elements n))
 
-(define (count-pairs n count)
-  ((cond ((zero? n) count)
-         ((one? n) count-pairs (quotient n 10) (+ count 1))
+;(define (count-pairs n count)
+ ; ((cond ((zero? n) count)
+  ;       ((one? n) count-pairs (quotient n 10) (+ count 1))
          
 
-(define (count-iter n count)
-  (let ((rmd (modulo n 10)) (complement (quotient n 100))
-  ((cond ((zero? n) count)
-         ((two? n) (count-pairs complement) 
+;(define (count-iter n count)
+ ; (let ((rmd (modulo n 10)) (complement (quotient n 100))
+  ;((cond ((zero? n) count)
+   ;      ((two? n) (count-pairs complement) 
