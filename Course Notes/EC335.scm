@@ -144,11 +144,11 @@
 ; Base Case: 112 or 122 are the most basic inputs given. Either one will return 1 since only one pair can be created because of the fact
 ; that there are NO complements, and within the paired group (1) or (2), there are no LD-elements within the parentheses 
 (define (make-pairs n complement)
-  (let ((my-comp complement)
-        (n-length (length n))
-        (my-comp-length (length complement)))
-    (cond ((not (> my-comp-length 2)) (get-LD-elements (modulo n (expt 10 (- n-length my-comp-length)))))
-          (else (+ (search-pair-iter my-comp (quotient my-comp 100) (rmd my-comp) (rmd (quotient my-comp 100)) 0)
+  (let   ((n-length (length n))
+          (my-comp-length (length complement)))
+    (cond ((zero? complement) (get-LD-elements n))
+          ((not (> my-comp-length 2)) (get-LD-elements (modulo n (expt 10 (- n-length my-comp-length)))))
+          (else (+ (search-pair-iter complement (quotient complement 100) (rmd complement) (rmd (quotient complement 100)) 0)
                    (get-LD-elements (modulo n (expt 10 (- n-length my-comp-length)))))))))
 
 ; Iterative main function:
@@ -182,14 +182,14 @@
         (search-pair-iter n (slice n-search-1) 2ptr (rmd (slice n-search-1)) (+ LD-elements (make-pairs n (slice n-search-1)))))))
 
 ;(search-pair-iter 12121212 121212 2 2 1)
-;(get-LD-elements 181121322156122) ; 37
-;(get-LD-elements 10101012020202) ; 14
+(get-LD-elements 181121322156122) ; 37
+(get-LD-elements 10101012020202) ; 14
 (get-LD-elements 11112222) ; 14
-;(get-LD-elements 11111522222) ; 70
-;(get-LD-elements 1111122222) ; 50
-;(get-LD-elements 1212222) ; 3
-;(get-LD-elements 11022) ; 2
-;(get-LD-elements 11822) ; 2
-;(get-LD-elements 1122) ; 1
-;(get-LD-elements 1121212122) ; my personal test case, 9
-
+(get-LD-elements 11111522222) ; 70
+(get-LD-elements 1111122222) ; 50
+(get-LD-elements 1212222) ; 3
+(get-LD-elements 11022) ; 2
+(get-LD-elements 11822) ; 2
+(get-LD-elements 1122) ; 1
+(get-LD-elements 1121212122) ; my personal test case, 9
+(get-LD-elements 111152222) ; 20
