@@ -38,6 +38,13 @@
 (define (remove-crust n)
   (quotient (modulo n (expt 10 (- (length n) 1))) 10))
 
+; Readability helper function: slice
+; Precond: n >=0 is an integer
+; Postcond: returns a smaller n without the rmd of n
+(define (slice n)
+  (quotient n 10))
+
+
 ; Once we've removed "the crust" of the LD-number, we can start iterating from the right
 ; to the left. Whenever we approach a 2, we need to call a recursive function that will
 ; thus search for a 1 to pair with it. Note that the first step is completely skipped
@@ -125,7 +132,32 @@
 ; is basically the order of the calls, and how LD-element values are passed to each other to sum up and then return
 ; that final value.
 
-; Let's start coding!                              
+; Let's start coding!
+
+; Helper function: make-pairs
+; Design Idea: Function make-pairs will basically be a helper function that will find all the pairs within the complement, within the new paired groups
+; and sum them up and return it to the search-pair-iter for accumulation.
+; Precondition: n>=0 is an integer where (rmd n) is a 2 only.
+; Postcondition: returns a NUMERICAL value that represents number of LD-elements existing in complement and first discovered paired group.
+; IH: We will either search for pairs in both the complement and the actual pair. At each step, we will finish
+; counting the number of pairs for the current number and move on to the next iteration where we finalize the current 2 that we are pairing with,
+; and then slice the current number n to search for the next 2 to do the exact same to.
+
+; IS: At each step, we will check to see if the complement is zero, which means we just pass the entire number to our main function.
+; Then, we need to check if the complement length is less than 2, but greater than 0, in which case we calculate the number of LD-elements in the currently found pair
+; In any other case where we have a complement length > 2, we add whatever number of pairs we found from searching the complement to the number of LD-elements found in current pair.
+; In all cases, we are searching a smaller version of n, which means that we will eventually reach our base case similar to or exactly 112 or 122 and terminate, and
+; return the total accumulated amount back to the main iterative function.
+
+; Base Case: 112 or 122 are the most basic inputs given. Either one will return 1 since only one pair can be created because of the fact
+; that there are NO complements, and within the paired group (1) or (2), there are no LD-elements within the parentheses 
+(define (make-pairs n complement)
+  (let   ((n-length (length n))
+          (my-comp-length (length complement)))
+    (cond ((zero? complement) (get-LD-elements n))
+          ((not (> my-comp-length 2)) (get-LD-elements (modulo n (expt 10 (- n-length my-comp-length)))))
+          (else (+ (search-pair-iter complement (quotient complement 100) (rmd complement) (rmd (quotient complement 100)) 0)
+                   (get-LD-elements (modulo n (expt 10 (- n-length my-comp-length)))))))))
 
 ; Iterative main function:
 ; Design Idea: Guard calls the iterative function and the guard makes sure to remove the crust and set LD-elements to 1 since we have by default
@@ -146,60 +178,27 @@
 ; New n becomes 12 and LD-element = 1. 
 ; Preserved? Given a number 1122 post-crusting, it is entirely NYP by default. Once it finds the first 2 and then the 1, it is not done processing until reaching
 ; the final 1. Once this has been done, 112 is NYP, and the far right 2 is AP. We will never revisit this specific 2 to check if it is a 2.
-; So let's check: n = 112 * 10^[1] + 2 = 112 * 10 + 2 = 1120 + 2 = 1122. 
+; So let's check: n = 112 * 10^[1] + 2 = 112 * 10 + 2 = 1120 + 2 = 1122.
+
 (define (get-LD-elements n)
   (search-pair-iter (remove-crust n) (quotient (remove-crust n) 100) (rmd (remove-crust n)) (rmd (quotient (remove-crust n) 100)) 1))
 (define (search-pair-iter n n-search-1 2ptr 1ptr LD-elements)
-  (cond ((zero? (quotient n 100)) LD-elements)
-        ((not (two? 2ptr)) (search-pair-iter (slice n) (slice n-search-1) (rmd (slice n)) (rmd (slice n-search-1)) LD-elements))
-        ((not (one? 1ptr)) (search-pair-iter n (slice n-search-1) 2ptr (rmd (slice n-search-1)) LD-elements))
-        (else
-         (search-pair-iter n (slice n-search-1) 2ptr (rmd (slice n-search-1)) (+ LD-elements (make-pairs n n-search-1))))))
+  (cond((zero? (quotient n 100)) LD-elements)
+       ((zero? n-search-1) (search-pair-iter (slice n) (quotient (slice n) 100) (rmd (slice n)) (rmd (quotient (slice n) 100)) LD-elements))
+       ((not (two? 2ptr)) (search-pair-iter (slice n) (slice n-search-1) (rmd (slice n)) (rmd (slice n-search-1)) LD-elements))
+       ((not (one? 1ptr)) (search-pair-iter n (slice n-search-1) 2ptr (rmd (slice n-search-1)) LD-elements))
+       (else
+        (search-pair-iter n (slice n-search-1) 2ptr (rmd (slice n-search-1)) (+ LD-elements (make-pairs n (slice n-search-1)))))))
 
-; Helper function: make-pairs
-; Design Idea: Function make-pairs will basically be a helper function that will find all the pairs within the complement, within the new paired groups
-; and sum them up and return it to the search-pair-iter for accumulation.
-; Precondition: n>=0 is an integer where (rmd n) is a 2 only.
-; Postcondition: returns a NUMERICAL value that represents number of LD-elements existing in complement and first discovered paired group.
-; IH: 
-; IS:
-; Base Case: 112 or 122 are the most basic inputs given. Either one will return 1 since only one pair can be created because of the fact
-; that there are NO complements, and within the paired group (1) or (2), there are no LD-elements within the parentheses 
-(define (make-pairs n complement)
-  (let ((my-comp (slice complement))
-        (n-length (length n))
-        (my-comp-length (length (slice complement))))
-    (cond ((not (> my-comp-length 2)) 0)
-          (else (+ (search-pair-iter my-comp (quotient my-comp 100) (rmd my-comp) (rmd (quotient my-comp 100)) 0)
-                   (get-LD-elements (modulo n (expt 10 (- n-length my-comp-length)))))))))
-
-; Readability helper function: slice
-; Precond: n >=0 is an integer
-; Postcond: returns a smaller n without the rmd of n
-(define (slice n)
-  (quotient n 10))
-;(get-LD-elements 11112222)
-;(get-LD-elements 181121322156122) ; 37
-;(get-LD-elements 10101012020202) ; 14
-;(get-LD-elements 111152222) ; 20
-;(get-LD-elements 11111522222) ; 70
-;(get-LD-elements 1111122222) ; 50
-;(get-LD-elements 1212222) ; 3
-;(get-LD-elements 11022) ; 2
+;(search-pair-iter 12121212 121212 2 2 1)
+(get-LD-elements 181121322156122) ; 37
+(get-LD-elements 10101012020202) ; 14
+(get-LD-elements 11112222) ; 14
+(get-LD-elements 11111522222) ; 70
+(get-LD-elements 1111122222) ; 50
+(get-LD-elements 1212222) ; 3
+(get-LD-elements 11022) ; 2
 (get-LD-elements 11822) ; 2
-;(get-LD-elements 1122) ; 1
-;(get-LD-elements 1121212122) ; my personal test case, 9
-
-; Abrar's code
-
-;(define (count-LD-elements n))
-
-;(define (count-pairs n count)
- ; ((cond ((zero? n) count)
-  ;       ((one? n) count-pairs (quotient n 10) (+ count 1))
-         
-
-;(define (count-iter n count)
- ; (let ((rmd (modulo n 10)) (complement (quotient n 100))
-  ;((cond ((zero? n) count)
-   ;      ((two? n) (count-pairs complement) 
+(get-LD-elements 1122) ; 1
+(get-LD-elements 1121212122) ; my personal test case, 9
+(get-LD-elements 111152222) ; 20

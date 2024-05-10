@@ -139,8 +139,16 @@
 ; and sum them up and return it to the search-pair-iter for accumulation.
 ; Precondition: n>=0 is an integer where (rmd n) is a 2 only.
 ; Postcondition: returns a NUMERICAL value that represents number of LD-elements existing in complement and first discovered paired group.
-; IH: 
-; IS:
+; IH: We will either search for pairs in both the complement and the actual pair. At each step, we will finish
+; counting the number of pairs for the current number and move on to the next iteration where we finalize the current 2 that we are pairing with,
+; and then slice the current number n to search for the next 2 to do the exact same to.
+
+; IS: At each step, we will check to see if the complement is zero, which means we just pass the entire number to our main function.
+; Then, we need to check if the complement length is less than 2, but greater than 0, in which case we calculate the number of LD-elements in the currently found pair
+; In any other case where we have a complement length > 2, we add whatever number of pairs we found from searching the complement to the number of LD-elements found in current pair.
+; In all cases, we are searching a smaller version of n, which means that we will eventually reach our base case similar to or exactly 112 or 122 and terminate, and
+; return the total accumulated amount back to the main iterative function.
+
 ; Base Case: 112 or 122 are the most basic inputs given. Either one will return 1 since only one pair can be created because of the fact
 ; that there are NO complements, and within the paired group (1) or (2), there are no LD-elements within the parentheses 
 (define (make-pairs n complement)
@@ -170,7 +178,8 @@
 ; New n becomes 12 and LD-element = 1. 
 ; Preserved? Given a number 1122 post-crusting, it is entirely NYP by default. Once it finds the first 2 and then the 1, it is not done processing until reaching
 ; the final 1. Once this has been done, 112 is NYP, and the far right 2 is AP. We will never revisit this specific 2 to check if it is a 2.
-; So let's check: n = 112 * 10^[1] + 2 = 112 * 10 + 2 = 1120 + 2 = 1122. 
+; So let's check: n = 112 * 10^[1] + 2 = 112 * 10 + 2 = 1120 + 2 = 1122.
+
 (define (get-LD-elements n)
   (search-pair-iter (remove-crust n) (quotient (remove-crust n) 100) (rmd (remove-crust n)) (rmd (quotient (remove-crust n) 100)) 1))
 (define (search-pair-iter n n-search-1 2ptr 1ptr LD-elements)
