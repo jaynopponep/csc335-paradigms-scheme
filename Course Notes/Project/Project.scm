@@ -47,7 +47,10 @@
                       (get-LD-elements (modulo n (expt 10 (- n-length my-comp-length)))))))))
 
 (define (get-LD-elements n)
-  (search-pair-iter (remove-crust n) (quotient (remove-crust n) 100) (rmd (remove-crust n)) (rmd (quotient (remove-crust n) 100)) '()))
+  (cond
+    ((< n 100) n)
+    (else 
+     (search-pair-iter (remove-crust n) (quotient (remove-crust n) 100) (rmd (remove-crust n)) (rmd (quotient (remove-crust n) 100)) '()))))
 (define (search-pair-iter n n-search-1 2ptr 1ptr result)
   (cond((zero? (quotient n 100)) result)
        ((zero? n-search-1) (search-pair-iter (slice n) (quotient (slice n) 100) (rmd (slice n)) (rmd (quotient (slice n) 100)) (cons (bracket-num n n-search-1) result)))
@@ -60,6 +63,8 @@
   (cons (quotient first 10) (list (list (get-LD-elements (quotient second 10))))))
 
 (get-LD-elements 111222) ; 4
+; desired results:
+; (1122) (1(2)) ((12)) ((1)2)
 ;; 2.  Write and prove correct a syntax checker for TLS-scheme, as specified in HW 11.
 
 ;; 3.  Write and prove correct an interpreter for TLS extended by let*.
