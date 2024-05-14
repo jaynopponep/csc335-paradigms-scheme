@@ -62,6 +62,8 @@
 (define (bracket-num first second)
   (cons (quotient first 10) (list (list (get-LD-elements (quotient second 10))))))
 
+(get-LD-elements 11112222)
+
 (get-LD-elements 111222) ; 4
 ; desired results:
 ; (1122) (1(2)) ((12)) ((1)2)
