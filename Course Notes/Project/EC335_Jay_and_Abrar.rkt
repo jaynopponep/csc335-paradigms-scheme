@@ -6,7 +6,7 @@
 ; Non-primitive common functions:
 (define (length n)
   (cond ((< n 10) 1)
-  (else (+ 1 (length (/ n 10))))))
+        (else (+ 1 (length (/ n 10))))))
 
 (define (rmd n)
   (modulo n 10))
@@ -180,6 +180,7 @@
 ; the final 1. Once this has been done, 112 is NYP, and the far right 2 is AP. We will never revisit this specific 2 to check if it is a 2.
 ; So let's check: n = 112 * 10^[1] + 2 = 112 * 10 + 2 = 1120 + 2 = 1122.
 
+
 (define (get-LD-elements n)
   (search-pair-iter (remove-crust n) (quotient (remove-crust n) 100) (rmd (remove-crust n)) (rmd (quotient (remove-crust n) 100)) 1))
 (define (search-pair-iter n n-search-1 2ptr 1ptr LD-elements)
@@ -199,6 +200,7 @@
 (get-LD-elements 1212222) ; 3
 (get-LD-elements 11022) ; 2
 (get-LD-elements 11822) ; 2
+(get-LD-elements 111222) ; 4
 (get-LD-elements 1122) ; 1
 (get-LD-elements 1121212122) ; my personal test case, 9
 (get-LD-elements 111152222) ; 20
