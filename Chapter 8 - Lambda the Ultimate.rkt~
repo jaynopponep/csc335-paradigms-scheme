@@ -96,7 +96,6 @@
       ((eq? x (quote +)) +)
       ((eq? x (quote *)) *)
       (else ^))))
-(atom-to-function '+)
 (define operator
   (lambda (aexp)
     (car aexp)))
@@ -128,32 +127,16 @@
        (multiremberT test? (cdr lat)))
       (else (cons (car lat)
                   (multiremberT test? (cdr lat)))))))
+(define eq?-tuna
+  (eq?-c (quote tuna)))
+
+(multiremberT eq?-tuna '(shrimp salad tuna salad and tuna))
+
 
 ; collector functions we may utilize:
 (define a-friend
   (lambda (x y)
     (null? y))) ; returns whether second argument is the empty list
-
-; note col is short for collector below, sometimes known as continuation
-
-(define multirember&co
-  (lambda (a lat col)
-    (cond
-      ((null? lat)
-       (col (quote ()) (quote ())))
-      ((eq? (car lat) a)
-       (multirember&co a
-                       (cdr lat)
-                       (lambda (newlat seen)
-                         (col newlat
-                              (cons (car lat) seen)))))
-      (else
-       (multirember&co a
-                       (cdr lat)
-                       (lambda (newlat seen)
-                         (col (cons (car lat) newlat)
-                              seen)))))))
-
 (define new-friend
   (lambda (newlat seen)
     (a-friend newlat
