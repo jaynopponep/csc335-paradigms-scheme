@@ -68,7 +68,7 @@
 (define (bracket-num first second)
   (cons (quotient first 10) (list (list (get-LD-elements (quotient second 10))))))
 
-(get-LD-elements 11112222)
+;(get-LD-elements 11112222)
 
 (get-LD-elements 111222) ; 4
 ; desired results:
@@ -101,12 +101,14 @@
 
 ; Helper function to check if the expression is syntactically valid
 (define (valid-expr? expr)
-    (cond ((atom? expr) (valid-atom? expr))  ; Check if the atom is valid
-          ((list? expr) (valid-list? expr))  ; Check if the list form is valid
-          (else #f)))                      ; Anything else is invalid
+    (cond ((atom? expr) (valid-atom? expr))  ; If the expression is an atom, check for validity.
+          ((list? expr) (valid-list? expr))  ; If the expression is a list, check for list-validity.
+          (else #f)))                        ; Anything else that comes up is invalid.
 
 
 ; Helper function to check if an atom is valid
+; In tls-scheme, the only valid atoms are cons, car, cdr, null?, eq?, atom?, zero?, add1, mul, sub1, number?. We check for those here.
+
 (define (valid-atom? atom)
     (or (number? atom)
         (boolean? atom)
@@ -125,12 +127,12 @@
 
 ; Helper function to check list expressions
 (define (valid-list? list)
-    (and (not (null? list))                ; Non-empty list
-         (valid-list-form? (car list))     ; List's can be quotes, lambdas, define's etc.
-         (apply valid-args? (cdr list))))  ; Valid arguments
+    (and (not (null? list))                ; A valid list expression cannot be non-empty.
+         (valid-list-type? (car list))     ; List's can be quotes, lambdas, define's etc. We check for those types here.
+         (apply valid-args? (cdr list))))  ; Otherwise, we check to see if the rest of the expression has valid arguments. 
 
-; Check the head of a list for a valid form
-(define valid-list-form?
+; There are different types/forms of lists. It could be a quote, lambda, cond, or an atom + valid list expr.
+(define valid-list-type?
   (lambda (form)
     (or (eq? form (quote quote))
         (eq? form (quote lambda))
@@ -143,7 +145,7 @@
     (or (valid-atom? fun)                  ; Must be a valid atom or
         (and (list? fun) (valid-list? fun))))) ; another valid list expression
 
-; returns number of arguments the operation takes
+; returns number of arguments an operation takes. function's kind of like a lookup table.
 (define (num-args op)
   (cond ((eq? op `cons) 2)
         ((eq? op `car) 1)
@@ -151,19 +153,21 @@
         ((eq? op `null?) 1)
         ((eq? op `atom?) 1)
         ((eq? op `zero?) 1)
-        ((eq? op `add1) 1) ; add 1
-        ((eq? op `mul) 2) ; multiply
-        ((eq? op `sub1) 1) ; subtract 1
+        ((eq? op `add1) 1) ; add 1 as defined in tls-scheme
+        ((eq? op `mul) 2) ; multiply as defined in tls-scheme
+        ((eq? op `sub1) 1) ; subtract 1 as defined in tls-scheme
         ((eq? op `number?) 1)
         (else 0)))
 
+; Helper function to check if the first item of the expression is an operator. Operators always take as input 1 or more arguments.
 (define (operator? exp)
   (> (num-args (car exp)) 0))
 
+; Helper function to check if an operator and it's arguments are valid. Use the lookup table, and check if the len of the arguments match up with the expected len.
 (define (correct-args-len op arg)
   (= (num-args op) (list-length arg)))
 
-; ensure all arguments are valid
+; Helper function to check if arguments are valid. The expression itself must be a valid expression AND the arguments must be of the correct length.
 (define (valid-args? op args)
     (and (valid-expr? op) (correct-args-len op args)))
 
@@ -177,8 +181,9 @@
 (display ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;True Conditions;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;")
 (newline)
 
-(valid-syntax? `3) ; #t
-(valid-syntax? `(cons 1 2)) ; #t
+(valid-syntax? `3) ; #t. this is just an atom, which should be valid
+(valid-syntax? `(cons 1 2)) ; #t. This is a valid expression type/form and the number of arguments are correct.
+; The rest of these are all basically checking if our valid-syntax function recognizes the built in functions/special forms and their arg count.
 (valid-syntax? `(number? 1))   ; #t
 (valid-syntax? `(add1 2)) ; #t
 (valid-syntax? `(sub1 2)) ; #t
