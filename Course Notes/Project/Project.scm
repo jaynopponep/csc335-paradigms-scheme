@@ -75,6 +75,75 @@
 ; (1122) (1(2)) ((12)) ((1)2)
 
 
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Abrar's Code for LD NUM
+
+(define ldnums '())
+
+(define (replace-ld ldnum i-left i-right)
+  (let ((new-ldnum (list-copy ldnum)))
+    (list-set! new-ldnum i-left "(")
+    (list-set! new-ldnum i-right ")")
+    new-ldnum))
+
+(define (list-copy lst)
+  (if (null? lst)
+      '()
+      (cons (car lst) (list-copy (cdr lst)))))
+
+(define (list-set! lst idx val)
+  (let ((n 0))
+    (do ((lst lst (cdr lst)))
+        ((null? lst))
+      (if (= n idx)
+          (set-car! lst val))
+      (set! n (+ n 1)))))
+
+(define (two-nyp ldnum i-left i-right)
+  (if (>= i-left (length ldnum))
+      '()
+      (if (> i-right (- (length ldnum) 1))
+          (two-nyp ldnum (+ i-left 1) (+ i-left 2))
+          (if (or (equal? (list-ref ldnum i-left) "(")
+                  (equal? (list-ref ldnum i-right) ")"))
+              '()
+              (if (and (equal? (list-ref ldnum i-left) 1)
+                       (equal? (list-ref ldnum i-right) 2)
+                       (> (abs (- i-left i-right)) 1))
+                  (let ((new-ldnum (replace-ld ldnum i-left i-right)))
+                    (set! ldnums (cons new-ldnum ldnums))
+                    (two-nyp new-ldnum (+ i-left 1) (+ i-left 1))
+                    (two-nyp ldnum i-left (+ i-right 1))
+                    (two-nyp new-ldnum (+ i-right 1) (+ i-right 1)))
+                  (two-nyp ldnum i-left (+ i-right 1)))))))
+
+(define (main)
+  (define ldnums-list (list
+                       '(1 1 2 1 2 2)
+                       '(1 1 2)
+                       '(1 2 3 4 5 2)
+                       '(1 4 1 3 2 1 4 1 2 2)
+                       '(1 1 2 2)))
+  (for-each
+   (lambda (ldnum)
+     (set! ldnums '())
+     (two-nyp ldnum 0 1)
+     (display "Case: ") (display ldnum) (newline)
+     (for-each
+      (lambda (ld)
+        (display ld) (newline))
+      ldnums)
+     (display "LDs Generated: ") (display (length ldnums)) (newline) (newline))
+   ldnums-list))
+
+(main)
+
+
+
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (newline)
 (display ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;Question 2- tls syntax checker;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;")
