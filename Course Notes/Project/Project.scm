@@ -328,133 +328,130 @@
 (newline)
 ;; 3.  Write and prove correct an interpreter for TLS extended by let*.
 
-(define (build s1 s2)
-    (cons s1 (cons s2 (quote ()))))
+(define (create-pair s1 s2)
+  (cons s1 (cons s2 '())))
 
-(define first car)
-(define second cadr)
-(define third caddr)
+(define get-first car)
+(define get-second cadr)
+(define get-third caddr)
 
-(define (atom? x)
-    (and (not (pair? x)) (not (null? x))))
+(define (is-atom? x)
+  (and (not (pair? x)) (not (null? x))))
 
-(define extend-table cons)
+(define extend-environment cons)
 
+(define (lookup name env default-fn)
+  (if (null? env)
+      (default-fn name)
+      (lookup-in-entry name (car env) (lambda ()
+                                        (lookup name (cdr env) default-fn)))))
 
-(define (lookup-in-table name table table-f)
-    (if (null? table)
-        (table-f name)
-        (lookup-in-entry name (car table) (lambda ()
-                                            (lookup-in-table name (cdr table) table-f)))))
+(define (lookup-in-entry name entry default-fn)
+  (if (null? entry)
+      (default-fn)
+      (let ((names (entry-names entry))
+            (vals (entry-values entry)))
+        (if (eq? (car names) name)
+            (car vals)
+            (default-fn)))))
 
+(define create-entry create-pair)
 
-(define (lookup-in-entry name entry table-f)
-    (if (null? entry)
-        (table-f)
-        (let ((names (names entry))
-              (vals (vals entry)))
-          (if (eq? (car names) name)
-              (car vals)
-              (table-f)))))
-
-
-(define new-entry build)
-
-(define (names entry)
+(define (entry-names entry)
   (car entry))
 
-(define (vals entry)
+(define (entry-values entry)
   (cadr entry))
 
-(define (value e)
-    (meaning e (quote ())))
+(define (evaluate expr)
+  (evaluate-expression expr '()))
 
-(define (meaning e table)
-    ((expression-to-action e) e table))
+(define (evaluate-expression expr env)
+  ((expression-to-action expr) expr env))
 
-(define (expression-to-action e)
-    (cond  ((atom? e) (atom-to-action e))
-           (else (list-to-action e))))
+(define (expression-to-action expr)
+  (cond ((is-atom? expr) (atom-to-action expr))
+        (else (list-to-action expr))))
 
-(define (atom-to-action e)
-  (cond ((number? e) *const)
-        ((eq? e #t) *const)
-        ((eq? e #f) *const)
-        ((eq? e (quote cons)) *const)
-        ((eq? e (quote car)) *const)
-        ((eq? e (quote cdr)) *const)
-        ((eq? e (quote null?)) *const)
-        ((eq? e (quote eq?)) *const)
-        ((eq? e (quote atom?)) *const)
-        ((eq? e (quote zero?)) *const)
-        ((eq? e (quote add1)) *const)
-        ((eq? e (quote mul)) *const)
-        ((eq? e (quote sub1)) *const)
-        ((eq? e (quote number?)) *const)
-        (else *identifier)))
+(define (atom-to-action expr)
+  (cond ((number? expr) evaluate-constant)
+        ((eq? expr #t) evaluate-constant)
+        ((eq? expr #f) evaluate-constant)
+        ((eq? expr 'cons) evaluate-constant)
+        ((eq? expr 'car) evaluate-constant)
+        ((eq? expr 'cdr) evaluate-constant)
+        ((eq? expr 'null?) evaluate-constant)
+        ((eq? expr 'eq?) evaluate-constant)
+        ((eq? expr 'atom?) evaluate-constant)
+        ((eq? expr 'zero?) evaluate-constant)
+        ((eq? expr 'add1) evaluate-constant)
+        ((eq? expr 'mul) evaluate-constant)
+        ((eq? expr 'sub1) evaluate-constant)
+        ((eq? expr 'number?) evaluate-constant)
+        (else evaluate-identifier)))
 
-(define (list-to-action e)
-    (cond ((atom? (car e)) (cond ((eq? (car e) (quote quote)) *quote)
-                                 ((eq? (car e) (quote lambda)) *lambda)
-                                 ((eq? (car e) (quote cond)) *cond)
-                                 ((eq? (car e) (quote let*)) *let*)
-                                 (else *application)))
-          (else *application)))
+(define (list-to-action expr)
+  (cond ((is-atom? (car expr)) 
+         (cond ((eq? (car expr) 'quote) evaluate-quote)
+               ((eq? (car expr) 'lambda) evaluate-lambda)
+               ((eq? (car expr) 'cond) evaluate-cond)
+               ((eq? (car expr) 'let*) evaluate-let*)
+               (else evaluate-application)))
+        (else evaluate-application)))
 
-(define (*const e table)
-  (cond ((number? e) e)
-        ((eq? e #t) #t)
-        ((eq? e #f) #f)
-        (else (build (quote primitive) e))))
+(define (evaluate-constant expr env)
+  (cond ((number? expr) expr)
+        ((eq? expr #t) #t)
+        ((eq? expr #f) #f)
+        (else (create-pair 'primitive expr))))
 
-(define (*identifier e table)
-    (lookup-in-table e table initial-table))
+(define (evaluate-identifier expr env)
+  (lookup expr env initial-environment))
 
-(define (initial-table name)
-    (car (quote ())))
-
+(define (initial-environment name)
+  (car '()))
 
 ; DESIGN IDEA
-; In order to implement *let*, we take a list of bindings and add it to the environment
+; In order to implement evaluate-let*, we take a list of bindings and add it to the environment
 ; Each binding is the variable associated with the variable's value for evaluation
   
 ; PRECONDITION
 ; the variables:
-; e must be a valid let* expression
-; table must be a valid environment table
+; expr must be a valid let* expression
+; env must be a valid environment table
 
 ; POSTCONDITION
-; Returns a new table with the new bindings called on the *let* function
+; Returns a new environment with the new bindings called on the let* function
 
 ; BASIS STEP 
-; Check if null? bindings is true. If so -> return new-table 
+; Check if null? bindings is true. If so -> return new-env 
 
 ; INDUCTIVE HYPOTHESIS
-; *let* subsequentially adds each binding to the environment.
+; evaluate-let* sequentially adds each binding to the environment.
   
 ; INDUCTIVE STEP:
-; *let* processes bindings in a list direction
+; evaluate-let* processes bindings in a list direction
 ; each binding is a variable to its corresponding value or expression
-; each binding's value expression is evaluated with meaning
-; new binding extends the new table, then recursively calling itself to add more
+; each binding's value expression is evaluated with evaluate-expression
+; new binding extends the new environment, then recursively calling itself to add more
 ; bindings to the list
 
-(define (*let* e table)
-  (define (process-bindings bindings new-table)
-    (cond ((null? bindings) new-table)
+(define (evaluate-let* expr env)
+  (define (process-bindings bindings new-env)
+    (cond ((null? bindings) new-env)
           (else (let ((binding (car bindings)))
                   (let ((var (car binding))
-                        (val (meaning (cadr binding) new-table)))
+                        (val (evaluate-expression (cadr binding) new-env)))
                     (process-bindings (cdr bindings)
-                                      (extend-table (new-entry (list var) (list val)) new-table)))))))
-  (let* ((bindings (second e))        
-         (body (third e))             
-         (final-table (process-bindings bindings table)))  ; Process all bindings sequentially
-    (meaning body final-table)))    ; Evaluate the body in the context of the final table
-
+                                      (extend-environment (create-entry (list var) (list val)) new-env)))))))
+  (let* ((bindings (get-second expr))        
+         (body (get-third expr))             
+         (final-env (process-bindings bindings env)))  ; Process all bindings sequentially
+    (evaluate-expression body final-env)))    ; Evaluate the body in the context of the final environment
 
 ; test cases
-(value `(let* ((a 2)) a))  ;; 2
-(value `(let* ((a 10) (b 11)) a))  ; 10
-(value `(let* ((a 10) (b 11)) b))  ; 11
+(evaluate '(let* ((a 2)) a))  ;; 2
+(evaluate '(let* ((a 10) (b 11)) a))  ; 10
+(evaluate '(let* ((a 10) (b 11)) b))  ; 11
+
 
