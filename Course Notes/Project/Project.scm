@@ -124,11 +124,59 @@
         (cons (f i (car lst)) (loop (+ i 1) (cdr lst))))))
 
 
+; precondition:
+;    ldnum:   a list of elements which can include integers or parentheses (as strings). This list represents the original sequence to be processed.
+;    i-left:  an integer index in the list ldnum indicating the current starting position for checking.
+;    i-right: an integer index in the list ldnum indicating the current ending position for checking.
 
-(define (two-nyp ldnum i-left i-right)
+; postconditions:
+;    the function returns a list of lists, where each list represents a new sequence with valid pairs of 1 and 2 replaced by "(" and ")", respectively.
+;    each generated sequence is added to the output list if a valid 1-2 pair is found and processed.
+;    the function processes all possible valid pairs and their recursive sub-pairs within the input list.
+
+; Algo design:
+;   Base Cases:
+;      If i-left is greater than or equal to the length of ldnum, the recursion terminates and returns an empty list because it has reached the end of the list.
+;      If i-right is greater than the last index of ldnum, the function recursively calls itself with i-left incremented by 1 and i-right
+;        set to i-left + 2 to check the next possible pair.
+
+;   Condition checks:
+;      If the element at i-left is "(" or the element at i-right is ")", the function returns an empty list since these positions are already processed.
+
+
+;   Finding Valid Pairs:
+
+;      If the element at i-left is 1 and the element at i-right is 2, and the distance between i-left
+;      and i-right is more than 1 (to ensure there is at least one element between them), it processes this pair:
+
+;        Creates a new list new-ldnum with the elements at i-left and i-right replaced by "(" and ")", respectively, using the replace-ld function.
+
+;        Recursively calls two-nyp on three cases:
+;            To find pairs within the first NYP (nested pairs) starting from i-left + 1.
+;            To continue searching for pairs ignoring the current pair by moving i-right to the next position.
+;            To find pairs within the second NYP starting from i-right + 1.
+
+
+;   Combining Results:
+;      Combines the results of all recursive calls using append and returns the combined list.
+
+
+; Example:
+;    ldnum: (1 1 2 1 2 2)
+;    i-left: 0
+;    i-right: 1
+
+; The function will:
+;    Identify the pair (1 2) at positions 0 and 2.
+;    Replace these with "(" and ")" resulting in ("(" 1 ")" 1 2 2).
+;    Recursively process the resulting list and other sublists.
+
+
+
+(define (generate-ld ldnum i-left i-right)
   (cond
     ((>= i-left (length ldnum)) '())
-    ((> i-right (- (length ldnum) 1)) (two-nyp ldnum (+ i-left 1) (+ i-left 2)))
+    ((> i-right (- (length ldnum) 1)) (generate-ld ldnum (+ i-left 1) (+ i-left 2)))
     ((or (equal? (list-ref ldnum i-left) "(")
          (equal? (list-ref ldnum i-right) ")")) '())
     ((and (equal? (list-ref ldnum i-left) 1)
@@ -136,21 +184,25 @@
           (> (abs (- i-left i-right)) 1))
      (let ((new-ldnum (replace-ld ldnum i-left i-right)))
        (append (list new-ldnum)
-               (two-nyp new-ldnum (+ i-left 1) (+ i-left 1))
-               (two-nyp ldnum i-left (+ i-right 1))
-               (two-nyp new-ldnum (+ i-right 1) (+ i-right 1)))))
-    (else (two-nyp ldnum i-left (+ i-right 1)))))
+               (generate-ld new-ldnum (+ i-left 1) (+ i-left 1))
+               (generate-ld ldnum i-left (+ i-right 1))
+               (generate-ld new-ldnum (+ i-right 1) (+ i-right 1)))))
+    (else (generate-ld ldnum i-left (+ i-right 1)))))
 
+
+; This main function was written to
 (define (main)
   (define ldnums-list (list
                        '(1 1 2 1 2 2)
-                       '(1 1 2)
-                       '(1 2 3 4 5 2)
-                       '(1 4 1 3 2 1 4 1 2 2)
-                       '(1 1 2 2)))
+                       ; the ones below are all test cases.
+                       ;'(1 1 2)
+                       ;'(1 2 3 4 5 2)
+                       ;'(1 4 1 3 2 1 4 1 2 2)
+                       ; '(1 1 2 2)
+                       ))
   (for-each
    (lambda (ldnum)
-     (let ((ldnums (two-nyp ldnum 0 1)))
+     (let ((ldnums (generate-ld ldnum 0 1)))
        (display "Case: ") (display ldnum) (newline)
        (for-each
         (lambda (ld)
@@ -159,7 +211,32 @@
        (display "LDs Generated: ") (display (length ldnums)) (newline) (newline)))
    ldnums-list))
 
-(main)
+ ;(main)
+
+(define (testld ldnum)
+  ; get the list of all possible ldnums generated
+  (let ((ldnums (generate-ld ldnum 0 1)))
+    ; display the current ld num being evaluated
+    (display "Case: ") (display ldnum) (newline)
+    (define (display-results results)
+      ; if there are no ldnums generated, return an empty list
+      (if (null? results)
+          '()
+          ; this ensures all the following expressions are evaluted in order from top to bottom. we don't want printing to be evaluated weirdly.
+          (begin
+            ; display the first ldnum generated and a newline
+            (display (car results)) (newline)
+            ; iteratively display the rest of the items. we are essentially cdr'ing down the list
+            (display-results (cdr results)))))
+    (display-results ldnums)
+    (display "LDs Generated: ") (display (length ldnums)) (newline) (newline)))
+
+;; Test cases
+(testld '(1 1 2 1 2 2))
+(testld '(1 1 2))
+(testld '(1 2 3 4 5 2))
+(testld '(1 4 1 3 2 1 4 1 2 2))
+(testld '(1 1 2 2))
 
 
 
