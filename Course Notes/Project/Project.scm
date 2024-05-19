@@ -1,18 +1,13 @@
 ;; CSc 335
 ;; Spring 2024
 ;; Project
-; #lang scheme
-;(load "project_helper.scm")
 ; Abrar Habib - ahabib002@citymail.cuny.edu
 ; Jay Noppone - npornpi000@citymail.cuny.edu
-
 
 ;; Released April 16 2024
 ;; Due by 23:59:59 May 18 2024, via email 
 
-;; I ask for complete developments and proved, working code for three problems:
-
-
+;; I ask for complete developments and proved, working code for three problems
 
 (newline)
 (display ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;Question 1. LD-NUM;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;")
@@ -20,62 +15,6 @@
 
 ;; 1.  Write and prove correct a program to input an LD number (as previously defined) which returns a list of all lists of
 ;; 1s and 2s which map to that number.  Use this program to check your solution to the takehome part of the midterm. 
-
-(define (len n)
-  (cond ((< n 10) 1)
-  (else (+ 1 (len (/ n 10))))))
-
-(define (rmd n)
-  (modulo n 10))
-
-(define (two? n)
-  (= n 2))
-
-(define (one? n)
-  (= n 1))
-
-(define (remove-crust n)
-  (quotient (modulo n (expt 10 (- (len n) 1))) 10))
-
-(define (slice n)
-  (quotient n 10))
-
-(define (unmake n search-1-len)
-  (let ((n-length (len n)))
-    (modulo n (expt 10 (- n-length search-1-len)))))
-
-(define (make-pairs n complement)
-  (let   ((n-length (len n))
-          (my-comp-length (len complement)))
-    (cond ((zero? complement) (get-LD-elements n))
-          ((not (> my-comp-length 2)) (cons complement (get-LD-elements (modulo n (expt 10 (- n-length my-comp-length))))))
-          (else (cons (search-pair-iter complement (quotient complement 100) (rmd complement) (rmd (quotient complement 100)) '())
-                      (get-LD-elements (modulo n (expt 10 (- n-length my-comp-length)))))))))
-
-(define (get-LD-elements n)
-  (cond
-    ((< n 100) n)
-    (else 
-     (search-pair-iter (remove-crust n) (quotient (remove-crust n) 100) (rmd (remove-crust n)) (rmd (quotient (remove-crust n) 100)) '()))))
-(define (search-pair-iter n n-search-1 2ptr 1ptr result)
-  (cond((zero? (quotient n 100)) result)
-       ((zero? n-search-1) (search-pair-iter (slice n) (quotient (slice n) 100) (rmd (slice n)) (rmd (quotient (slice n) 100)) (cons (bracket-num n n-search-1) result)))
-       ((not (two? 2ptr)) (search-pair-iter (slice n) (slice n-search-1) (rmd (slice n)) (rmd (slice n-search-1)) result))
-       ((not (one? 1ptr)) (search-pair-iter n (slice n-search-1) 2ptr (rmd (slice n-search-1)) result))
-       (else
-        (search-pair-iter n (slice n-search-1) 2ptr (rmd (slice n-search-1)) (cons (bracket-num n-search-1 (unmake n (len n-search-1))) (cons (make-pairs n (slice n-search-1)) result))))))
-
-(define (bracket-num first second)
-  (cons (quotient first 10) (list (list (get-LD-elements (quotient second 10))))))
-
-;(get-LD-elements 11112222)
-
-(get-LD-elements 111222) ; 4
-; desired results:
-; (1122) (1(2)) ((12)) ((1)2)
-
-
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Abrar's Code for LD NUM
@@ -392,36 +331,16 @@
 (define (build s1 s2)
     (cons s1 (cons s2 (quote ()))))
 
-(define first car); (1 2 3) ;returns 1
-(define second cadr); (1 2 3) ;returns 2
-(define third caddr); (1 2 3) ;returns 3
+(define first car)
+(define second cadr)
+(define third caddr)
 
 (define (atom? x)
     (and (not (pair? x)) (not (null? x))))
 
-(define (sub1 x)
-  (- x 1)) ; for testing our let bindings later
-
-;; Proof
-; Design Idea: The function is designed to search through a hierarchical table of environments to find the value associated with a given name.
-; The table contains many different scopes, and we just search through each scope to find the correct binding. 
-; If the name is not found in the current scope, the search proceeds to the next scope in the list.
-
-
-; Precon:
-; table is a list of enviornment scopes where each scope is a list of pairs
-; name is a symbol that needs to be search within the table
-; table-f is a fallback function called when the name is not found in any scope
-
-; Postcon: Returns the value assoicated with the name if found
-; Basis Step: The base case is when the table is null or empty 
-; Inductive Hypothesis: Assume the function correctly finds a variable's value or calls the fallback function for a table with n environments
-
-; Inductive Step: For each case, if the variable is found in the first scope '(car table)', 'look-in-entry' returns its value. In the case the variable is not found in the first scope, the function
-; recursively calls itself with the remaining 'n' scopes '(cdr table)'
 (define (lookup-in-table name table table-f)
     (if (null? table)
-        (table-f name)  ; Call fallback function if the table is empty
+        (table-f name)
         (lookup-in-entry name (car table) (lambda ()
                                             (lookup-in-table name (cdr table) table-f)))))
 
@@ -429,36 +348,14 @@
 
 (define (lookup-in-entry name entry table-f)
     (if (null? entry)
-        (table-f)  ; Handle empty entry
+        (table-f)
         (let ((names (names entry))
               (vals (vals entry)))
           (if (eq? (car names) name)
               (car vals)
               (table-f)))))
 
-; Proof
-; Design Idea: The function is designed to recurisvely examine each name in a list of names to check if it matches a given target name. If a match is found, it return corresponding value from a parallel
-; list of values. If no match is found and it reaches the end of the list, it calls a fallback function
 
-; Stopping Condition: The function terminations when it reaches the end of the names list (null? names) indicating that there are no more names to check
-
-
-
-; Pre Condition:
-; names = a list of symbols
-; vals = a parallel list of values corresponding to each name in the names list
-; entry-f = a fallback function that is called if the name is not found in the list
-
-; Post Condition: Returns the value assoicated with the taget name if it is found in the name list
-
-; Basis Step: The base case is when the names list is empty (null? names)
-
-; Inductive Hypothesis: Assume that the function correctly finds a name's value or calls the fallback function when given lists of length n
-; Inductive Step:
-; By the inductive hypothesis, the recursive call will correctly resolve the search in the remaining lists of length n or call 'entry-f':
-; If the first name in the list (car name) matches the target 'name', the function returns the corresponding value (car vals) correctly handling the match scenario.
-
-; If there is no match, the function recurses into the rest of the list (cdr names) and (cdr vals) 
 (define (lookup-in-entry-help name names vals entry-f)
     (cond ((null? names) (entry-f name))
           ((eq? (car names) name) (car vals))
@@ -472,7 +369,6 @@
 (define (vals entry)
   (cadr entry))
 
-; Everything below is taken from tls-scheme, meant to help us to implement the value function. We will need to get the value of one the expressions in the let. 
 (define (value e)
     (meaning e (quote ())))
 
@@ -529,22 +425,31 @@
 (define (*lambda e table)
     (build (quote non-primitive)
            (cons table (cdr e))))
-  ; Proof
-  ; Design Idea: The function takes a list of bindings and an environment table, and recursively process each binding by adding it to the environment. Each binding consists of a variable and its assoicated
-  ; expression which is evaluated in the context of the current envirionment before being added
+; DESIGN IDEA
+; In order to implement *let*, we take a list of bindings and add it to the environment
+; Each binding is the variable associated with the variable's value for evaluation
   
-  ; Pre Condition:
-  ; bindings = a list where each element is a pair `(var expr)` representing a variable and an expression to be evaluated
-  ; new-table = an environment table (A list of scopes, where each scope is a list of pairs) that the function will update with new bindings
+; PRECONDITION
+; the variables:
+; e must be a valid let* expression
+; table must be a valid environment table
+
+; POSTCONDITION
+; Returns a new table with the new bindings called on the *let* function
+
+; BASIS STEP 
+; Check if null? bindings is true. If so -> return new-table 
+
+; INDUCTIVE HYPOTHESIS
+; *let* subsequentially adds each binding to the environment.
   
-  ; Post Condition: Returns an updated enviornment table that includes all the bindings processed from the provided list
-  ; Basis Step: The base case is when the bindings list is empty `(null? bindings)`
-  ; Inductive Hypothesis: Assume that the function correctly processes a list of n bindings evaluating each expression and adding it to the environment resulting in an updated environment table
-  
-  ; Inductive Step: Considering the firsrt binding in the list which consists of a variable and its expression, the function evaluates val in the context of new-table to obtain its value. It then extends
-  ; the new-table with this new variable-value pair using extend-table and new-entry. The function then recurisvely calls itself with the remainder of the list which contains n bindings
-  
-  ; Stopping Condition: The recursion stops when bindings list is empty. 
+; INDUCTIVE STEP:
+; *let* processes bindings in a list direction
+; each binding is a variable to its corresponding value or expression
+; each binding's value expression is evaluated with meaning
+; new binding extends the new table, then recursively calling itself to add more
+; bindings to the list
+
 (define (*let* e table)
   (define (process-bindings bindings new-table)
     (cond ((null? bindings) new-table)
@@ -558,29 +463,10 @@
          (final-table (process-bindings bindings table)))  ; Process all bindings sequentially
     (meaning body final-table)))    ; Evaluate the body in the context of the final table
 
-
 (define table-of first)
 (define formals-of second)
 (define body-of third)
 
-; Proof
-; Design Idea: The function is designed to evaluate a list of conditional expressions within a given environment. It processes each line of a cond construct until it finds a true condition which then
-; evaluates and returns the corresponding answer
-
-; Pre Condition:
-; lines = A list of pairs where each pair represent a conditional line in a cond expression. Each pair is formatted as '(question answer)'
-; table = An environment table where variables are bound to variables used for expression evaluation
-
-; Post Condition: Returns the result of evaluating the asnwer assoicated with the first true question
-
-; Inductive Hypothesis: Assume that the function correctly evaluates a list of n conditional lines, finding the first true question and returning the corresponding answer or properly handling the absence of a
-; true condition
-
-; Inductive Step: If the else predicate applied to the question of the first line returns true, then the function evaluates and return the answer of the line '(answer-of (var lines))'. If the result of
-; evaluating the question of the first line in the context of 'table' is true, the function evaluates and returns the answer of this line. If none of the conditions are met, the function recurses with the
-; rest of the list which contains n lines
-
-; Stopping Condition: The recursion stops when the 'lines' list is empty. 
 (define (evcon lines table)
   (cond ((else? (question-of (car lines))) (meaning (answer-of (car lines)) table))
         ((meaning (question-of (car lines)) table) (meaning (answer-of (car lines)) table))
@@ -598,21 +484,6 @@
 
 (define cond-lines-of cdr)
 
-; Proof
-; Design Idea: The function is designed to evaluate each repression in a list of expressions in the context of a given environment and to construct a new list from the result of these evaluations
-
-; PreCondition:
-; args = A list of expression that are to be evaluated
-; table = An environment table where variables and functions are bound used for evaluating the expressions
-
-; PostCondition: Returns a new list containing the results of evaluating each expression in args within the given environment table
-; Base Case: The base case is when the list of expressions args is empty 
-; Inductive Hypothesis (IH): Assume the function correclty evaluates a list of n expressions and constructs a list of their results
-
-; Inductive Step (IS): The function evaluates the first expression in the list using 'meaning' in the context of the current enviornment 'table'. It then constructs a new list hwwere this result is the
-; head and the tail is the result of recursively calling 'evlis' on the rest of the list
-
-; Stopping Condition: The recursion stops when args list is completely empty 
 (define (evlis args table)
     (if (null? args)
         '()  
@@ -641,31 +512,50 @@
         ((non-primitive? fun) (myapply-closure (second fun) vals))))
 
 (define (myapply-primitive name vals)
-  (cond ((eq? name (quote cons)) (cons (first vals) (second vals)))
-        ((eq? name (quote car)) (car (first vals)))
-        ((eq? name (quote cdr)) (cdr (first vals)))
-        ((eq? name (quote null?))(null? (first vals)))
-        ((eq? name (quote eq?)) (eq? (first vals) (second vals)))
-        ((eq? name (quote atom?)) (:atom? (first vals)))
-        ((eq? name (quote zero?)) (zero? (first vals)))
-        ((eq? name (quote add1)) ((lambda (x) (+ x 1)) (first vals)))
-        ((eq? name (quote mul)) (* (first vals) (second vals)))
-        ((eq? name (quote sub1)) (sub1 (first vals)))
-        ((eq? name (quote number?)) (number? (first vals)))))
+  (cond ((eq? name (quote cons))
+         (cons (first vals) (second vals)))
+        ((eq? name (quote car))
+         (car (first vals)))
+        ((eq? name (quote cdr))
+         (cdr (first vals)))
+        ((eq? name (quote null?))
+         (null? (first vals)))
+        ((eq? name (quote eq?))
+         (eq? (first vals) (second vals)))
+        ((eq? name (quote atom?))
+         (:atom? (first vals)))
+        ((eq? name (quote zero?))
+         (zero? (first vals)))
+        ((eq? name (quote add1))
+         ((lambda (x) (+ x 1)) (first vals)))
+        ((eq? name (quote mul))
+         (* (first vals) (second vals)))
+        ((eq? name (quote sub1))
+         (sub1 (first vals)))
+        ((eq? name (quote number?))
+         (number? (first vals)))))
 
 (define (:atom? x)
-  (cond ((atom? x) #t)
-        ((null? x) #f)
-        ((eq? (car x) (quote primitive)) #t)
-        ((eq? (car x) (quote non-primitive)) #t)
-        (else #f)))
+  (cond ((atom? x)
+         #t)
+        ((null? x)
+         #f)
+        ((eq? (car x) (quote primitive))
+         #t)
+        ((eq? (car x) (quote non-primitive))
+         #t)
+        (else
+         #f)))
 
 (define (myapply-closure closure vals)
-    (meaning (body-of closure) (extend-table (new-entry (formals-of closure) vals) (table-of closure))))
+    (meaning (body-of closure)
+             (extend-table
+              (new-entry
+               (formals-of closure) vals)
+              (table-of closure))))
 
-; Example Usage
-(value `(let* ((x 60)) x))  ; Should return 60
-(value `(let* ((x 10) (y 20)) x))  ; Should return 10
-(value `(let* ((x 10) (y 20)) y))  ; Should return 20
-(value `(let* ((x 2) (r 3) (sd 2) (as 34)) (mul x (mul r (mul sd as))))) ; why does this return false?
-(value `(let* ((x 2) (l1 (quote 1 2 3))) (mul (car l1) x)))
+; test cases
+(value `(let* ((a 2)) a))  ;; 2
+(value `(let* ((a 10) (b 11)) a))  ; 10
+(value `(let* ((a 10) (b 11)) b))  ; 11
+
