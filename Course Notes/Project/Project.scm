@@ -221,32 +221,31 @@
 (newline)
 ;; 3.  Write and prove correct an interpreter for TLS extended by let*.
 
-;; 3.  Write and prove correct an interpreter for TLS extended by let*.
 (define (build s1 s2)
     (cons s1 (cons s2 (quote ()))))
 
-(define first car)
-(define second cadr)
-(define third caddr)
+(define first car); (1 2 3) ;returns 1
+(define second cadr); (1 2 3) ;returns 2
+(define third caddr); (1 2 3) ;returns 3
 
 (define (atom? x)
     (and (not (pair? x)) (not (null? x))))
 
 (define (sub1 x)
-  (- x 1))
+  (- x 1)) ; for testing our let bindings later
 
 ;; Proof
-; Design Idea: The function is designed to search through a hierarchical table of environments to find the value associated with a given name. If the name is not found in the current scope,
-; the search proceeds to the next scope in the list.
+; Design Idea: The function is designed to search through a hierarchical table of environments to find the value associated with a given name.
+; The table contains many different scopes, and we just search through each scope to find the correct binding. 
+; If the name is not found in the current scope, the search proceeds to the next scope in the list.
 
-; Stopping Condition: The search stops when it reaches an empty table ((null? table))
 
-; Pre Condition:
+; Precon:
 ; table is a list of enviornment scopes where each scope is a list of pairs
 ; name is a symbol that needs to be search within the table
 ; table-f is a fallback function called when the name is not found in any scope
 
-; Post Condition: Returns the value assoicated with the name if found
+; Postcon: Returns the value assoicated with the name if found
 ; Basis Step: The base case is when the table is null or empty 
 ; Inductive Hypothesis: Assume the function correctly finds a variable's value or calls the fallback function for a table with n environments
 
@@ -274,6 +273,8 @@
 ; list of values. If no match is found and it reaches the end of the list, it calls a fallback function
 
 ; Stopping Condition: The function terminations when it reaches the end of the names list (null? names) indicating that there are no more names to check
+
+
 
 ; Pre Condition:
 ; names = a list of symbols
@@ -303,6 +304,7 @@
 (define (vals entry)
   (cadr entry))
 
+; Everything below is taken from tls-scheme, meant to help us to implement the value function. We will need to get the value of one the expressions in the let. 
 (define (value e)
     (meaning e (quote ())))
 
