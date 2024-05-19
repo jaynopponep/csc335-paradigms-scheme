@@ -17,8 +17,6 @@
 ;; 1s and 2s which map to that number.  Use this program to check your solution to the takehome part of the midterm. 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Abrar's Code for LD NUM
-
 
 ; precondition:
 ;     ldnum is a list consisting of the ld number. So if our ld number we want to evalute is 1122, the value of ldnum will be '(1 1 2 2).
