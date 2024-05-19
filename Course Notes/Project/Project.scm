@@ -79,6 +79,37 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Abrar's Code for LD NUM
+
+
+; precondition:
+;     ldnum is a list consisting of the ld number. So if our ld number we want to evalute is 1122, the value of ldnum will be '(1 1 2 2).
+;     i-left is an index of sorts. this is the index at which the value should be replaced/interpreted as a "(".
+;     i-right is another index. this is the index at which the value should be replace/interpreted as a ")".
+
+; postcondition:
+;
+; returns a new list where
+;     the element at index i-left in the original ldnum list is replaced with "(".
+;     the element at inddex i-right in the original ldnum list is replaced with ")".
+; all other elements are left unchaged.
+
+; algorithm description
+;     it uses the map-indexed helper function to iterate over the ldnum list and apply that function to each element along with it's index.
+;     if the current index i is equal to i-left, it replaces the element at that index with "(".
+;     if the current index i is equal to i-right, it replaces the element at that index with ")".
+;     Otherwise, it leaves the element unchanged.
+;     The result is a new list with the specified replacements, which is then returned by the function.
+
+; Example:
+;    ldnum: '(1 1 2 1 2 2)
+;    i-left: 0
+;    i-right: 2
+
+; the replace-ld function will go to index 0 and replace that with a "(". it will go to the index 2 and replace that number with a ")".
+; the output would be:
+;    '( "(" 1 ")" 1 2 2)
+
+
 (define (replace-ld ldnum i-left i-right)
   (map-indexed (lambda (i x)
                  (cond ((= i i-left) "(")
@@ -91,6 +122,8 @@
     (if (null? lst)
         '()
         (cons (f i (car lst)) (loop (+ i 1) (cdr lst))))))
+
+
 
 (define (two-nyp ldnum i-left i-right)
   (cond
