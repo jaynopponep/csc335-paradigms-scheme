@@ -230,7 +230,11 @@
     (display (lookup 'n env))
     (newline)))
 
-; Testing lexical scope.
+; The purpose of this test is to show that variables are looked up in the same environment as where their function was defined.
+; Lexical scoping MEANS that variable bindings are resolved in the same environment as their
+; function definition (I'm assuming this would be called compile-time in C terms), and not in the environment in which the function was ran (runtime).
+
+; We should expect to see that "n" in the local environment is newly bound, but in the outer environment it stays the same.
 (define (lexical-test-func n outer-env)
   ; create a new environment called local-env where we bind "n" the character/string to whatever value was passed in for n. we can name this bound variable whatever.
   (let ((local-env (extend-env '(n) (list n) outer-env)))
@@ -238,13 +242,16 @@
     (display "in lexical-test-func (local environment), n=")
     (display (lookup 'n local-env))
     (newline)
-    ; then we display the value of n with a different environment: outer-env. if we correctly implemented global environment, this value should be the same.
+    ; then we display the value of n with a different environment: outer-env.
     (lexical-printer outer-env)))
 
-; Dynamic scoping test functions
+; Dynamic Scoping means that the scope of a variable is determined by the environment in which the function was called.
+; This is more akin to runtime environment scoping (not sure exactly of the proper term to use here).
+; For the dynamic scoping test, we should expect to  see the same value for n in the local environment and outer environments,
+; as they are run in the same scope, but a different value for n in the global scope, as it was run in a different scope.
 (define dynamic-printer
   (lambda (env)
-    (display "in dynamic-printer (current environment), n=")
+    (display "in dynamic-printer (outer environment), n=")
     (display (lookup 'n env))
     (newline)))
 
@@ -254,9 +261,9 @@
       (display "in dynamic-test-func (local environment), n=")
       (display (lookup 'n local-env))
       (newline)
-      (dynamic-printer local-env)))) ; Call dynamic-printer with the local environment
+      (dynamic-printer local-env)))) 
 
-; Run the lexical scoping test
+
 (define lexical-test
   (lambda ()
     (let ((outer-env (extend-env '(n) '(100) '())))
@@ -268,7 +275,7 @@
       (lexical-test-func 1 outer-env)
       (lexical-printer outer-env))))
 
-; Run the dynamic scoping test
+
 (define dynamic-test
   (lambda ()
     (let ((dynamic-global-env (extend-env '(n) '(100) '())))
