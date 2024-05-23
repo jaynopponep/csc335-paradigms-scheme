@@ -1,4 +1,3 @@
-
 ;; Second Problem
 
 ;; TLS is an environment passing interpreter, as we have discussed.
@@ -29,62 +28,68 @@
 ;; .scm document, with your comments / proofs embedded
 ;; in the usual way.
 
-
 ;; (You all know about Batman, right?)
 
 (define build
   (lambda (s1 s2)
     (cons s1 (cons s2 (quote ())))))
 
-(define first car)
+(define get-first car)
 
-(define second cadr)
+(define get-second cadr)
 
-(define third caddr)
+(define get-third caddr)
 
-(define atom?
+(define is-atom?
   (lambda (x)
     (and (not (pair? x)) (not (null? x)))))
 
-(define primitive?
+(define is-primitive?
   (lambda (l)
-    (eq? (first l) (quote primitive))))
+    (eq? (get-first l) (quote primitive))))
+
+(define is-non-primitive?
+  (lambda (l)
+    (eq? (get-first l) 'non-primitive)))
 
 ; The global environment is defined as global-env and is initially set to an empty list.
 ; This global environment will hold all variable bindings globally accessible throughout the interpreter's execution.
 
 (define global-env '())
 
-; Environment structure: a list of frames, each frame is a list of pairs (variable . value)
-(define empty-env '())
-
 ; Environments are represented as lists of frames, where each frame is a list of pairs of the form:(variable . value).
+(define empty-env '())
 
 (define extend-env
   (lambda (vars vals env)
     (cons (map cons vars vals) env)))
 
-; Define an error function for reporting unbound variables
+; Define an error function for reporting any error message and any variable associated with said error.
 (define error
-  (lambda (msg var)
-    (display msg)
+  (lambda (message var)
+    (display message)
     (display ": ")
     (display var)
-    (newline)
-    ))
+    (newline)))
+
+; Curry the error function to create an error-unbound function.
+(define error-unbound
+  (lambda (var)
+    (error "Unbound variable" var)))
 
 ; The lookup function searches for a variable in the given environment.
 ; If the variable is not found, it reports an error.
 (define lookup
   (lambda (var env)
-    (cond
-      ((null? env) (error "Unbound variable" var))
-      (else
-        (let ((frame (car env)))
-          (let ((binding (assoc var frame)))
-            (if binding
-                (cdr binding)
-                (lookup var (cdr env)))))))))
+    (let loop ((env env))
+      (cond
+        ((null? env) (error-unbound var))
+        (else
+          (let ((frame (car env)))
+            (let ((binding (assoc var frame)))
+              (if binding
+                  (cdr binding)
+                  (loop (cdr env))))))))))
 
 ; The value function acts as the top-level function for evaluating expressions.
 ; It calls meaning with the expression and the global environment.
@@ -97,11 +102,10 @@
   (lambda (e env)
     ((expression-to-action e) e env)))
 
-; taken directly from tls-scheme.scm
 (define expression-to-action
   (lambda (e)
     (cond
-      ((atom? e) (atom-to-action e))
+      ((is-atom? e) (atom-to-action e))
       (else (list-to-action e)))))
 
 (define atom-to-action
@@ -126,7 +130,7 @@
 (define list-to-action
   (lambda (e)
     (cond
-      ((atom? (car e))
+      ((is-atom? (car e))
        (cond
          ((eq? (car e) (quote quote)) *quote)
          ((eq? (car e) (quote lambda)) *lambda)
@@ -148,8 +152,6 @@
   (lambda (e env)
     (text-of e)))
 
-
-
 (define *identifier
   (lambda (e env)
     (lookup e env)))
@@ -168,8 +170,8 @@
 (define evcon
   (lambda (lines env)
     (cond
-      ((eq? (car (car lines)) 'else) (meaning (second (car lines)) env))
-      ((meaning (car (car lines)) env) (meaning (second (car lines)) env))
+      ((eq? (car (car lines)) 'else) (meaning (get-second (car lines)) env))
+      ((meaning (car (car lines)) env) (meaning (get-second (car lines)) env))
       (else (evcon (cdr lines) env)))))
 
 (define evlis
@@ -182,7 +184,7 @@
 
 (define *application
   (lambda (e env)
-    (myapply
+    (apply-function
      (meaning (function-of e) env)
      (evlis (arguments-of e) env))))
 
@@ -190,87 +192,66 @@
 
 (define arguments-of cdr)
 
-(define myapply
+(define apply-function
   (lambda (fun vals)
     (cond
-      ((primitive? fun)
-       (myapply-primitive (second fun) vals))
-      ((non-primitive? fun)
-       (myapply-closure (second fun) vals)))))
+      ((is-primitive? fun)
+       (apply-primitive (get-second fun) vals))
+      ((is-non-primitive? fun)
+       (apply-closure (get-second fun) vals)))))
 
-(define myapply-primitive
+(define apply-primitive
   (lambda (name vals)
     (cond
-      ((eq? name 'cons) (cons (first vals) (second vals)))
-      ((eq? name 'car) (car (first vals)))
-      ((eq? name 'cdr) (cdr (first vals)))
-      ((eq? name 'null?) (null? (first vals)))
-      ((eq? name 'eq?) (eq? (first vals) (second vals)))
-      ((eq? name 'atom?) (atom? (first vals)))
-      ((eq? name 'zero?) (zero? (first vals)))
-      ((eq? name 'add1) (+ (first vals) 1))
-      ((eq? name 'sub1) (- (first vals) 1))
-      ((eq? name 'number?) (number? (first vals)))
-      ((eq? name 'mul) (* (first vals) (second vals)))
+      ((eq? name 'cons) (cons (get-first vals) (get-second vals)))
+      ((eq? name 'car) (car (get-first vals)))
+      ((eq? name 'cdr) (cdr (get-first vals)))
+      ((eq? name 'null?) (null? (get-first vals)))
+      ((eq? name 'eq?) (eq? (get-first vals) (get-second vals)))
+      ((eq? name 'atom?) (is-atom? (get-first vals)))
+      ((eq? name 'zero?) (zero? (get-first vals)))
+      ((eq? name 'add1) (+ (get-first vals) 1))
+      ((eq? name 'sub1) (- (get-first vals) 1))
+      ((eq? name 'number?) (number? (get-first vals)))
+      ((eq? name 'mul) (* (get-first vals) (get-second vals)))
       (else (error "Unsupported primitive operation" name)))))
 
-(define myapply-closure
+(define apply-closure
   (lambda (closure vals)
-    (let ((closure-env (first closure))
-          (formals (second closure))
-          (body (third closure)))
+    (let ((closure-env (get-first closure))
+          (formals (get-second closure))
+          (body (get-third closure)))
       (meaning body (extend-env formals vals closure-env)))))
-
-(define non-primitive?
-  (lambda (l)
-    (eq? (first l) 'non-primitive)))
-
-
-  
-
-; Environment handling functions
-(define extend-env
-  (lambda (vars vals env)
-    (cons (map cons vars vals) env)))
-
-(define lookup
-  (lambda (var env)
-    (let loop ((env env))
-      (cond
-        ((null? env) (error "Unbound variable" var))
-        (else
-          (let ((frame (car env)))
-            (let ((binding (assoc var frame)))
-              (if binding
-                  (cdr binding)
-                  (loop (cdr env))))))))))
 
 ; Lexical scoping test functions
 (define lexical-printer
   (lambda (env)
-    (display "in lexical-printer, n=")
+    (display "in lexical-printer (outer environment), n=")
     (display (lookup 'n env))
     (newline)))
 
-(define lexical-test-func
-  (lambda (n outer-env)
-    (let ((local-env (extend-env '(n) (list n) outer-env)))
-      (display "in lexical-test-func, n=")
-      (display (lookup 'n local-env))
-      (newline)
-      (lexical-printer outer-env)))) ; Call lexical-printer with the outer environment
+; Testing lexical scope.
+(define (lexical-test-func n outer-env)
+  ; create a new environment called local-env where we bind "n" the character/string to whatever value was passed in for n. we can name this bound variable whatever.
+  (let ((local-env (extend-env '(n) (list n) outer-env)))
+    ; display the value of n in local-env to show that it was bound properly.
+    (display "in lexical-test-func (local environment), n=")
+    (display (lookup 'n local-env))
+    (newline)
+    ; then we display the value of n with a different environment: outer-env. if we correctly implemented global environment, this value should be the same.
+    (lexical-printer outer-env)))
 
 ; Dynamic scoping test functions
 (define dynamic-printer
   (lambda (env)
-    (display "in dynamic-printer, n=")
+    (display "in dynamic-printer (current environment), n=")
     (display (lookup 'n env))
     (newline)))
 
 (define dynamic-test-func
   (lambda (n dynamic-global-env)
     (let ((local-env (extend-env '(n) (list n) dynamic-global-env)))
-      (display "in dynamic-test-func, n=")
+      (display "in dynamic-test-func (local environment), n=")
       (display (lookup 'n local-env))
       (newline)
       (dynamic-printer local-env)))) ; Call dynamic-printer with the local environment
@@ -281,7 +262,7 @@
     (let ((outer-env (extend-env '(n) '(100) '())))
       (display "Lexical Scoping Test")
       (newline)
-      (display "in main program, n=")
+      (display "in main program (outer environment), n=")
       (display (lookup 'n outer-env))
       (newline)
       (lexical-test-func 1 outer-env)
@@ -293,7 +274,7 @@
     (let ((dynamic-global-env (extend-env '(n) '(100) '())))
       (display "Dynamic Scoping Test")
       (newline)
-      (display "in main program, n=")
+      (display "in main program (global environment), n=")
       (display (lookup 'n dynamic-global-env))
       (newline)
       (dynamic-test-func 1 dynamic-global-env)
