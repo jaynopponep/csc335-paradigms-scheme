@@ -277,7 +277,7 @@
       (dynamic-outer local-env)))) 
 
 
-(define check-lex
+(define lexical-test
   (lambda ()
     (let ((outer-env (extend-env '(n) '(69) '())))
       (display ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;Lexical Scoping Test;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;")
@@ -292,7 +292,7 @@
       (lexical-outer outer-env))))
 
 
-(define check-dyn
+(define dynamic-test
   (lambda ()
     (let ((dynamic-global-env (extend-env '(n) '(69) '())))
       (display ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;Dynamic Scoping Test;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;")
@@ -307,28 +307,10 @@
       (dynamic-outer dynamic-global-env))))
 
 ; Execute both tests
-(check-lex)
+(lexical-test)
 (newline)
-(check-dyn)
+(dynamic-test)
 
 
 ;; CORRECTNESS PROOF
-; To test both lexical scope and dynamic scoping within R5RS, we've constructed a setup for
-; lexical-test-func to test the lexical scoping, and dynamic-test-func to test along with it.
-; We can see when we run this program with this current environment set up that the lexical scope
-; is not able to access the 420 like the dynamic scope is able to. This is due to the crucial difference
-; between how the environments are being passed. In the lexical scope test function, we are passing
-; the outer-env, which doesn't store the 420; however within the local-env, 420 is defined thus only
-; accessible with the dynamic-global-env that we have set up. We check both environment behaviors
-; through both check-lex for lexical scoping and check-dyn for dynamic scoping.
 
-; When we call check-lex and check-dyn, these functions both set up the environment with
-; extend-env and appends the given variables & values to be binded together within the environment.
-; We basically show out the n values provided in the global environment, and then calls two functions
-; with different environments and values in order to look for what's printed out.
-; In dynamic-test-func, we create a new value to be binded to n, but within the same environment
-; Because it is set up dynamically, the environment that it looks up is going to be the global environment
-; where 420 is stored, in which the lexical-test-func is unable to retrieve the value 420 the same way
-; that the dynamic scoping is able to.
-; A consequence of dynamic scoping, however, is that there is a change in the flow of execution
-; that is different that the traditional static resolution 
