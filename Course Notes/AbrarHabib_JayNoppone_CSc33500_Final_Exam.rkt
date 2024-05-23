@@ -1,4 +1,6 @@
-;; Second Problem
+;; Problem #2 on Dynamic Scoping
+;; Jay Noppone Pornpitaksuk // 24187441
+;; Abrar Habib // 24298648
 
 ;; TLS is an environment passing interpreter, as we have discussed.
 
