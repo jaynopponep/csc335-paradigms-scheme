@@ -224,10 +224,14 @@
       (meaning body (extend-env formals vals closure-env)))))
 
 ; Lexical scoping test functions
-(define lexical-printer
+(define lexical-outer
   (lambda (env)
-    (display "in lexical-printer (outer environment), n=")
+    (display "function: lexical-outer,")
+    (display "(outer environment), env: ")
+    (display env)
+    (display ", value of n: ")
     (display (lookup 'n env))
+
     (newline)))
 
 ; The purpose of this test is to show that variables are looked up in the same environment as where their function was defined.
@@ -239,54 +243,74 @@
   ; create a new environment called local-env where we bind "n" the character/string to whatever value was passed in for n. we can name this bound variable whatever.
   (let ((local-env (extend-env '(n) (list n) outer-env)))
     ; display the value of n in local-env to show that it was bound properly.
-    (display "in lexical-test-func (local environment), n=")
+     (display "function: lexical-test-func")
+    (display "(local environment), env: ")
+    (display local-env)
+    (display ", value of n: ")
     (display (lookup 'n local-env))
     (newline)
     ; then we display the value of n with a different environment: outer-env.
-    (lexical-printer outer-env)))
+    (lexical-outer outer-env)))
 
 ; Dynamic Scoping means that the scope of a variable is determined by the environment in which the function was called.
 ; This is more akin to runtime environment scoping (not sure exactly of the proper term to use here).
-; For the dynamic scoping test, we should expect to  see the same value for n in the local environment and outer environments,
+; For the dynamic scoping test, we should expect to see the same value for n in the local environment and outer environments,
 ; as they are run in the same scope, but a different value for n in the global scope, as it was run in a different scope.
-(define dynamic-printer
+(define dynamic-outer
   (lambda (env)
-    (display "in dynamic-printer (outer environment), n=")
+    (display "function: dynamic-outer")
+    (display "(outer environment), env: ")
+    (display env)
+    (display ", value of n: ")
     (display (lookup 'n env))
     (newline)))
 
 (define dynamic-test-func
   (lambda (n dynamic-global-env)
     (let ((local-env (extend-env '(n) (list n) dynamic-global-env)))
-      (display "in dynamic-test-func (local environment), n=")
+      (display "function: dynamic-test-func")
+      (display "(local environment), env: ")
+      (display local-env)
+      (display ", value of n: ")
       (display (lookup 'n local-env))
       (newline)
-      (dynamic-printer local-env)))) 
+      (dynamic-outer local-env)))) 
 
 
 (define lexical-test
   (lambda ()
-    (let ((outer-env (extend-env '(n) '(100) '())))
-      (display "Lexical Scoping Test")
+    (let ((outer-env (extend-env '(n) '(69) '())))
+      (display ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;Lexical Scoping Test;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;")
       (newline)
-      (display "in main program (outer environment), n=")
+      (display "in main program (global environment), env: ")
+      (display "function: lexical-test")
+      (display outer-env)
+      (display ", value of n: ")
       (display (lookup 'n outer-env))
       (newline)
-      (lexical-test-func 1 outer-env)
-      (lexical-printer outer-env))))
+      (lexical-test-func 420 outer-env)
+      (lexical-outer outer-env))))
 
 
 (define dynamic-test
   (lambda ()
-    (let ((dynamic-global-env (extend-env '(n) '(100) '())))
-      (display "Dynamic Scoping Test")
+    (let ((dynamic-global-env (extend-env '(n) '(69) '())))
+      (display ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;Dynamic Scoping Test;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;")
       (newline)
-      (display "in main program (global environment), n=")
+      (display "in main program (global environment), env: ")
+      (display "function: dynamic-test")
+      (display dynamic-global-env)
+      (display ", value of n: ")
       (display (lookup 'n dynamic-global-env))
       (newline)
-      (dynamic-test-func 1 dynamic-global-env)
-      (dynamic-printer dynamic-global-env))))
+      (dynamic-test-func 420 dynamic-global-env)
+      (dynamic-outer dynamic-global-env))))
 
 ; Execute both tests
 (lexical-test)
+(newline)
 (dynamic-test)
+
+
+;; CORRECTNESS PROOF
+
